@@ -1,0 +1,23 @@
+language: scala
+
+sudo: false
+
+scala:
+- 2.10.5
+- 2.11.7
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+
+script:
+  - scripts/travis-publish.sh
+
+notifications:
+  webhooks:
+    urls:
+    - https://webhooks.gitter.im/e/30f837cd3dec6d6230c2
+    on_success: change
+    on_failure: always
+    on_start: false
