@@ -8,7 +8,7 @@ import ScoverageSbtPlugin._
 
 /**
  * These aliases serialise the build for the benefit of Travis-CI, also useful for pre-PR testing.
- * If new projects are added to the build, these must be updated.  
+ * If new projects are added to the build, these must be updated.
  */
 addCommandAlias("buildJVM", ";macrosJVM/compile;coreJVM/compile;lawsJVM/compile;testsJVM/test")
 addCommandAlias("validateJVM", ";scalastyle;buildJVM;makeSite")
@@ -20,7 +20,7 @@ addCommandAlias("validate", ";validateJS;validateJVM")
  */
 val home = "https://github.com/banana-rdf/scala-bricks"
 val repo = "git@github.com:banana-rdf/scala-bricks.git"
-val api = "https://banana-rdf.github.io/scala-bricks/api/"  
+val api = "https://banana-rdf.github.io/scala-bricks/api/"
 val license = ("Apache License", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
 val disciplineVersion = "0.4"
@@ -87,11 +87,11 @@ lazy val macros = crossProject.crossType(CrossType.Pure)
   .jsSettings(commonJsSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
 
-lazy val macrosJVM = macros.jvm 
+lazy val macrosJVM = macros.jvm
 lazy val macrosJS = macros.js
 
 /**
- * Core - cross project that defines macros is the main project for the build 
+ * Core - cross project that defines macros is the main project for the build
  */
 lazy val core = crossProject.crossType(CrossType.Dummy)
   .dependsOn(macros)
@@ -121,7 +121,7 @@ lazy val lawsJS = laws.js
 
 /**
  * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
- *         all the tests for this build. 
+ *         all the tests for this build.
  */
 lazy val tests = crossProject.crossType(CrossType.Pure)
   .dependsOn(macros, core, laws)
@@ -190,7 +190,7 @@ lazy val publishSettings = Seq(
       </developer>
     </developers>
   )
-) ++ credentialSettings ++ sharedPublishSettings ++ sharedReleaseProcess 
+) ++ credentialSettings ++ sharedPublishSettings ++ sharedReleaseProcess
 
 lazy val scoverageSettings = Seq(
   ScoverageKeys.coverageMinimum := 60,
