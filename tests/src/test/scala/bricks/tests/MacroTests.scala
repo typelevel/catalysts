@@ -1,7 +1,7 @@
 package bricks
 package tests
 
-import bricks.macros.ClassMacros._
+import bricks.macros.ClassInfo._
 import bricks.macros._
 
 class MacroTests extends TestSuite {
@@ -11,8 +11,13 @@ class MacroTests extends TestSuite {
   }
 
   test("Test TypeTagM") {
-    def f[A](implicit tag: TypeTagM[A]): String = tag.tpe.toString
+    def f1[A](implicit tag: TypeTagM[A]): String = tag
+    def f2[A](implicit tag: TypeTagM[A]): String = tag.name
+    def f3[A](implicit tag: TypeTagM[A]): String = tag.toString
 
-    assert(f[List[Map[Int, Double]]] == "List[Map[Int,Double]]")
+    val expected = "List[Map[Int,Double]]"
+    assert(f1[List[Map[Int, Double]]] == expected)
+    assert(f2[List[Map[Int, Double]]] == expected)
+    assert(f3[List[Map[Int, Double]]] == expected)
   }
 }

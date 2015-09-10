@@ -1,17 +1,19 @@
 package bricks
 package macros
 
-object ClassMacros {
+import scala.language.experimental.macros
+import scala.reflect.macros.whitebox
 
-  def className(that: Any): String = macro classNameMacro
+import macrocompat.bundle
 
-  def classNameMacro(c: XScala.Context)( that: c.Expr[Any]): c.Expr[String] = {
-    import c.universe._
+object ClassInfo {
+  def className(that: Any): String = macro ClassInfoMacros.classNameImpl
+}
 
-    c.Expr[String](q"bricks.macros.ClassMacros.classNameImpl($that)")
-  }
+@bundle
+class ClassInfoMacros(val c: whitebox.Context) {
+  import c.universe._
 
-  def classNameImpl(that: Any): String = {
-    that.getClass.getName.stripSuffix("$")
-  }
+  def classNameImpl(that: c.Expr[Any]): c.Expr[String] =
+    c.Expr[String](q"$that.getClass.getName")
 }

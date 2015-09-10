@@ -7,6 +7,7 @@ import com.typesafe.sbt.SbtSite.SiteKeys._
 import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
 import pl.project13.scala.sbt.SbtJmh._
 import sbtunidoc.Plugin.UnidocKeys._
+import sbtunidoc.Plugin._
 import sbtrelease.ReleasePlugin.autoImport._
 import ReleaseTransformations._
 import org.scalajs.sbtplugin.ScalaJSPlugin
@@ -29,7 +30,7 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
     }
   }
 
-lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
+  def scalaMacroDependencies(version: String): Seq[Setting[_]] = Seq(
   libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -38,8 +39,8 @@ lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
       // in Scala 2.10, quasiquotes are provided by macro paradise
       case Some((2, 10)) =>
         Seq(
-          compilerPlugin("org.scalamacros" %% "paradise" % "2.0.1" cross CrossVersion.full),
-              "org.scalamacros" %% "quasiquotes" % "2.0.1" cross CrossVersion.binary
+          compilerPlugin("org.scalamacros" %% "paradise" % version cross CrossVersion.full),
+              "org.scalamacros" %% "quasiquotes" % version cross CrossVersion.binary
         )
     }
   }
@@ -93,6 +94,10 @@ lazy val sharedReleaseProcess = Seq(
     commitNextVersion,
     ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
     pushChanges)
+)
+
+lazy val unidocCommonSettings = Seq(
+  scalacOptions in (ScalaUnidoc, unidoc) += "-Ymacro-no-expand"
 )
 
 lazy val warnUnusedImport = Seq(

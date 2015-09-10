@@ -10,27 +10,31 @@ import ScoverageSbtPlugin._
  * These aliases serialise the build for the benefit of Travis-CI, also useful for pre-PR testing.
  * If new projects are added to the build, these must be updated.
  */
-addCommandAlias("buildJVM", ";macrosJVM/compile;coreJVM/compile;lawsJVM/compile;testsJVM/test")
-addCommandAlias("validateJVM", ";scalastyle;buildJVM;makeSite")
-addCommandAlias("validateJS", ";macrosJS/compile;coreJS/compile;lawsJS/compile;testsJS/test")
+addCommandAlias("buildJVM", ";macrosJVM/compile;platformJVM/compile;lawsJVM/compile;testsJVM/test")
+addCommandAlias("validateJVM", ";scalastyle;buildJVM")
+addCommandAlias("validateJS", ";macrosJS/compile;platformJS/compile;lawsJS/compile;testsJS/test")
 addCommandAlias("validate", ";validateJS;validateJVM")
+addCommandAlias("validateAll", s";++$scalacVersion;clean;makeSite;+validate") 
 
 /**
  * Build settings
  */
-val home = "https://github.com/banana-rdf/scala-bricks"
-val repo = "git@github.com:banana-rdf/scala-bricks.git"
-val api = "https://banana-rdf.github.io/scala-bricks/api/"
+val home = "https://github.com/InTheNow/scala-bricks"
+val repo = "git@github.com:InTheNow/scala-bricks.git"
+val api = "https://InTheNow.github.io/scala-bricks/api/"
 val license = ("Apache License", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
 val disciplineVersion = "0.4"
+val macroCompatVersion = "1.0.0"
+val paradiseVersion = "2.1.0-M5"
 val scalacheckVersion = "1.12.4"
 val scalatestVersion = "3.0.0-M7"
+val scalacVersion = "2.11.7"
 
 lazy val buildSettings = Seq(
-  organization := "org.banana-rdf",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", "2.11.7")
+  organization := "InTheNow.github",
+  scalaVersion := scalacVersion,
+  crossScalaVersions := Seq("2.10.5", scalacVersion)
 )
 
 /**
@@ -39,14 +43,15 @@ lazy val buildSettings = Seq(
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions,
   parallelExecution in Test := false
-) ++ warnUnusedImport
+  // resolvers += Resolver.sonatypeRepo("snapshots")
+) ++ warnUnusedImport ++ unidocCommonSettings
 
 lazy val commonJsSettings = Seq(
   scalaJSStage in Global := FastOptStage
 )
 
 lazy val commonJvmSettings = Seq(
-  testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
+ // testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF)
 )
 
 /**
@@ -65,15 +70,15 @@ lazy val bricksJVM = project.in(file(".bricksJVM"))
   .settings(moduleName := "bricks")
   .settings(bricksSettings)
   .settings(commonJvmSettings)
-  .aggregate(macrosJVM, coreJVM, lawsJVM, testsJVM, docs)
-  .dependsOn(macrosJVM, coreJVM, lawsJVM, testsJVM % "test-internal -> test")
+  .aggregate(macrosJVM, platformJVM, lawsJVM, testsJVM, docs)
+  .dependsOn(macrosJVM, platformJVM, lawsJVM, testsJVM % "test-internal -> test")
 
 lazy val bricksJS = project.in(file(".bricksJS"))
   .settings(moduleName := "bricks")
   .settings(bricksSettings)
   .settings(commonJsSettings)
-  .aggregate(macrosJS, coreJS, lawsJS, testsJS)
-  .dependsOn(macrosJS, coreJS, lawsJS, testsJS % "test-internal -> test")
+  .aggregate(macrosJS, platformJS, lawsJS, testsJS)
+  .dependsOn(macrosJS, platformJS, lawsJS, testsJS % "test-internal -> test")
   .enablePlugins(ScalaJSPlugin)
 
 /**
@@ -82,8 +87,8 @@ lazy val bricksJS = project.in(file(".bricksJS"))
 lazy val macros = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "bricks-macros")
   .settings(bricksSettings:_*)
-  .settings(crossVersionSharedSources:_*)
-  .settings(scalaMacroDependencies:_*)
+  .settings(libraryDependencies += "org.typelevel" %%% "macro-compat" % macroCompatVersion % "compile")
+  .settings(scalaMacroDependencies(paradiseVersion):_*)
   .jsSettings(commonJsSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
 
@@ -91,24 +96,24 @@ lazy val macrosJVM = macros.jvm
 lazy val macrosJS = macros.js
 
 /**
- * Core - cross project that defines macros is the main project for the build
+ * Platform - cross project that provides cross platform support
  */
-lazy val core = crossProject.crossType(CrossType.Dummy)
+lazy val platform = crossProject.crossType(CrossType.Dummy)
   .dependsOn(macros)
-  .settings(moduleName := "bricks-core")
+  .settings(moduleName := "bricks-platform")
   .settings(bricksSettings:_*)
-  .settings(scalaMacroDependencies:_*)
+  .settings(scalaMacroDependencies(paradiseVersion):_*)
   .jsSettings(commonJsSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
 
-lazy val coreJVM = core.jvm
-lazy val coreJS = core.js
+lazy val platformJVM = platform.jvm
+lazy val platformJS = platform.js
 
 /**
  * Laws - cross project that defines macros the laws for all other projects
  */
 lazy val laws = crossProject.crossType(CrossType.Pure)
-  .dependsOn(macros, core)
+  .dependsOn(macros, platform)
   .settings(moduleName := "bricks-laws")
   .settings(bricksSettings:_*)
   .settings(disciplineDependencies:_*)
@@ -124,7 +129,7 @@ lazy val lawsJS = laws.js
  *         all the tests for this build.
  */
 lazy val tests = crossProject.crossType(CrossType.Pure)
-  .dependsOn(macros, core, laws)
+  .dependsOn(macros, platform, laws)
   .settings(moduleName := "bricks-tests")
   .settings(bricksSettings:_*)
   .settings(disciplineDependencies:_*)
@@ -150,11 +155,11 @@ lazy val docs = project
   .settings(tutSettings)
   .settings(tutScalacOptions ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))))
   .settings(commonJvmSettings)
-  .dependsOn(coreJVM, lawsJVM, testsJVM)
+  .dependsOn(platformJVM, lawsJVM, testsJVM)
 
 lazy val docSettings = Seq(
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(coreJVM, lawsJVM),
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(platformJVM, lawsJVM),
   site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
   site.addMappingsToSiteDir(tut, "_tut"),
   ghpagesNoJekyll := false,
