@@ -10,11 +10,11 @@ import ScoverageSbtPlugin._
  * These aliases serialise the build for the benefit of Travis-CI, also useful for pre-PR testing.
  * If new projects are added to the build, these must be updated.
  */
-addCommandAlias("buildJVM", ";macrosJVM/compile;platformJVM/compile;lawsJVM/compile;testsJVM/test")
+addCommandAlias("buildJVM", ";macrosJVM/compile;platformJVM/compile;lawsJVM/compile;scalatestJVM/compile;testsJVM/test")
 addCommandAlias("validateJVM", ";scalastyle;buildJVM")
-addCommandAlias("validateJS", ";macrosJS/compile;platformJS/compile;lawsJS/compile;testsJS/test")
+addCommandAlias("validateJS", ";macrosJS/compile;platformJS/compile;lawsJS/compile;scalatestJS/compile;testsJS/test")
 addCommandAlias("validate", ";validateJS;validateJVM")
-addCommandAlias("validateAll", s";++$scalacVersion;clean;makeSite;+validate") 
+addCommandAlias("validateAll", s";++$scalacVersion;+clean;+validate;++$scalacVersion;docs/makeSite") 
 
 /**
  * Build settings
@@ -40,7 +40,7 @@ lazy val buildSettings = Seq(
 /**
  * Common settings
  */
-lazy val commonSettings = Seq(
+lazy val commonSettings = sharedCommonSettings ++ Seq(
   scalacOptions ++= commonScalacOptions,
   parallelExecution in Test := false
   // resolvers += Resolver.sonatypeRepo("snapshots")
@@ -70,7 +70,7 @@ lazy val bricksJVM = project.in(file(".bricksJVM"))
   .settings(moduleName := "bricks")
   .settings(bricksSettings)
   .settings(commonJvmSettings)
-  .aggregate(macrosJVM, platformJVM, lawsJVM, testsJVM, docs)
+  .aggregate(macrosJVM, platformJVM, lawsJVM, scalatestJVM, testsJVM, docs)
   .dependsOn(macrosJVM, platformJVM, lawsJVM, testsJVM % "test-internal -> test")
 
 lazy val bricksJS = project.in(file(".bricksJS"))
@@ -78,7 +78,7 @@ lazy val bricksJS = project.in(file(".bricksJS"))
   .settings(bricksSettings)
   .settings(commonJsSettings)
   .aggregate(macrosJS, platformJS, lawsJS, testsJS)
-  .dependsOn(macrosJS, platformJS, lawsJS, testsJS % "test-internal -> test")
+  .dependsOn(macrosJS, platformJS, lawsJS, scalatestJS, testsJS % "test-internal -> test")
   .enablePlugins(ScalaJSPlugin)
 
 /**
@@ -125,11 +125,25 @@ lazy val lawsJVM = laws.jvm
 lazy val lawsJS = laws.js
 
 /**
+ * Scalatest - cross project that defines test utilities for scalatest
+ */
+lazy val scalatest = crossProject.crossType(CrossType.Pure)
+  //.dependsOn()
+  .settings(moduleName := "bricks-scalatest")
+  .settings(bricksSettings:_*)
+  .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion)
+  .jsSettings(commonJsSettings:_*)
+  .jvmSettings(commonJvmSettings:_*)
+
+lazy val scalatestJVM = scalatest.jvm
+lazy val scalatestJS = scalatest.js
+
+/**
  * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
  *         all the tests for this build.
  */
 lazy val tests = crossProject.crossType(CrossType.Pure)
-  .dependsOn(macros, platform, laws)
+  .dependsOn(macros, platform, laws, scalatest % "test-internal -> test")
   .settings(moduleName := "bricks-tests")
   .settings(bricksSettings:_*)
   .settings(disciplineDependencies:_*)
@@ -154,19 +168,23 @@ lazy val docs = project
   .settings(docSettings)
   .settings(tutSettings)
   .settings(tutScalacOptions ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))))
+  .settings(doctestSettings)
+  .settings(doctestTestFramework := DoctestTestFramework.ScalaTest)
+  .settings(doctestWithDependencies := false)
   .settings(commonJvmSettings)
   .dependsOn(platformJVM, lawsJVM, testsJVM)
 
 lazy val docSettings = Seq(
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(platformJVM, lawsJVM),
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(platformJVM, lawsJVM, macrosJVM, scalatestJVM, testsJVM),
   site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
   site.addMappingsToSiteDir(tut, "_tut"),
   ghpagesNoJekyll := false,
   siteMappings += file("CONTRIBUTING.md") -> "contributing.md",
   scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
     "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
-    "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath
+    "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath,
+    "-diagrams"
   ),
   git.remoteRepo := repo,
   includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
@@ -180,12 +198,8 @@ lazy val disciplineDependencies = Seq(
   libraryDependencies += "org.typelevel" %%% "discipline" % disciplineVersion
 )
 
-lazy val publishSettings = Seq(
-  homepage := Some(url(home)),
-  licenses += license,
-  scmInfo :=  Some(ScmInfo(url(home), "scm:git:" + repo)),
+lazy val publishSettings = sharedPublishSettings(home, repo, api, license) ++ Seq(
   autoAPIMappings := true,
-  apiURL := Some(url(api)),
   pomExtra := (
     <developers>
       <developer>
@@ -195,7 +209,7 @@ lazy val publishSettings = Seq(
       </developer>
     </developers>
   )
-) ++ credentialSettings ++ sharedPublishSettings ++ sharedReleaseProcess
+) ++ credentialSettings ++ sharedReleaseProcess
 
 lazy val scoverageSettings = Seq(
   ScoverageKeys.coverageMinimum := 60,

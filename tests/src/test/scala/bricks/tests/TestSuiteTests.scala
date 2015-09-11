@@ -1,7 +1,7 @@
 package bricks
 package tests
 
-class StdTestTests extends TestSuite {
+class StdTestTests extends TestSuite with scalatest.DisableTripleEquals {
 
   test("StdTest minSuccessful") {
     val min = if (Platform.isJvm) 100 else 10
