@@ -10,6 +10,9 @@ object ClassInfo {
   def className(that: Any): String = macro ClassInfoMacros.classNameImpl
 }
 
+/**
+ * Do not use this directly, rather [[bricks.macros.ClassInfo]]
+ */
 @bundle
 class ClassInfoMacros(val c: whitebox.Context) {
   import c.universe._

@@ -5,9 +5,11 @@ import bricks.laws.LawChecks
 import org.scalatest.{FunSuite, PropSpec}
 import org.scalatest.prop.PropertyChecks
 
+/**
+ * 
+ */
 sealed trait AllTests 
-  extends ScalatestExtra 
-  with    TestSettings 
+  extends TestSettings 
   with    TestInstances 
   with    TestNotifications 
   with    StdTest {

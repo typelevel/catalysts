@@ -65,7 +65,15 @@ lazy val commonScalacOptions = Seq(
   "-Xfuture"
 )
 
-lazy val sharedPublishSettings = Seq(
+lazy val sharedCommonSettings = Seq(
+  updateOptions := updateOptions.value.withCachedResolution(true) 
+)
+
+def sharedPublishSettings(home: String, repo: String, api: String, license: (String, URL)): Seq[Setting[_]] = Seq(
+  homepage := Some(url(home)),
+  licenses += license,
+  scmInfo :=  Some(ScmInfo(url(home), "scm:git:" + repo)),
+  apiURL := Some(url(api)),
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishMavenStyle := true,

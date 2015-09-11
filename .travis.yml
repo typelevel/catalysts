@@ -1,23 +1,29 @@
 language: scala
-
 sudo: false
-
 scala:
 - 2.10.5
 - 2.11.7
-
+script:
+- scripts/travis-publish.sh
 cache:
   directories:
-    - $HOME/.ivy2/cache
-    - $HOME/.sbt
-
-script:
-  - scripts/travis-publish.sh
-
+  - "$HOME/.sbt/0.13/dependency"
+  - "$HOME/.sbt/boot/scala*"
+  - "$HOME/.sbt/launchers"
+  - "$HOME/.ivy2/cache"
+before_cache:
+- du -h -d 1 $HOME/.ivy2/cache
+- du -h -d 2 $HOME/.sbt/
+- find $HOME/.sbt -name "*.lock" -type f -delete
+- find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
 notifications:
   webhooks:
     urls:
-    - https://webhooks.gitter.im/e/30f837cd3dec6d6230c2
+    - https://webhooks.gitter.im/e/c5bebf7d686684123f55
     on_success: change
     on_failure: always
     on_start: false
+env:
+  global:
+  - secure: RRTd4UooXhiHEpO+vy7vZUzOhwkgOugiAg3saMtdPEgMoMBniG87QLDoDuYnATIt5YtOkz6pX6a0fqm/0ocv+Fw2e9nuGo7KcrOdR5fpsVCA8giNUhsU9CK9t2fQ2Hhz4cd173CKMZ4QSfO9jgpIM5KQQ4lBfAPdixzrtTHaK000CZLOmYqbYudLfvpnVFi0rkUmgbKwLSozB/LaC946hCVyFpD9hxK43Tn46EoKmCzBIyPU2cP8HYPPKqGr93LCEkyXSTdgtIRqVBJTQoCabDSx0YzGxnure81O7Nv3dnQBmxIJ/IVcJV8CPF3ZPcw8W59ULAd0DBYX1dXq9bHBVrkFGoPIHHdL4ym0o2TZd240FdC/mMF6Xl9zc6YfIEjqLdLNOJgowbAHhNhjYDqfI0CqR9mtomoVa8SNdLpofGTuPePbHGSFiS3aDRKI5SlVOH43DeIzW7st2reHZNY3hjhpXqtFVgZZZd0Xk+7NmPpdd1ClLLvgKTcn68GwBW94GMM13F4a9fmmnOMNLGvLIM2qMtuK4eKPi13mJpeF7OlAF39Or9KSa9aXesyQzwMtBzddGdatHaW/sAZdVYZV7aebfUh+31BeLgYvMp3BvYR5NEh/CaU0SHE161ip/7asGqx4o2bRfS0Q3V2M8rqjypq4FsycIfJthhUau3ok2cM=
+  - secure: zwush1H+A+2varSQoHC57JIXh9RQ3B5cEcZ73K9ocV0HhDgWa89GcaSQwyDSVIkCZBpuJNoVYLCw+Sn8ttjRueMys1HjVCpCeWj2FiTYCT655pl8AvuZ6GiVN4aBmlo9sKlP60t8KRT8PZfmpGt65i7A9NTBwiEbK+0PXVEybFbvzII4HdwOTzrsO7q7Cok0srtZUiVD4IcC2oOqvcXg2la1LSMfEf2XwY0sYqJMvy0z3Y/h/WJNvupfJRBIXJ8zFTeeNsa8MweY/BZm2+iJj4ejScU4og5T/aK6kVUerb1/pn0sfuRdcKf9qc0JFyUl4e+/yWvIcvtCrnDVb87pyGqqzhPFgm1wgDGhee/ctg8wBQwVGbP5NnKPYc6YokrmIBH73dt/oSMAxD6JBaLycgEYVLveZtPq+y6hHD8paV8WWJd2EEcfw/Bbg6qZRhs7m0LSy+Y/9OgxuKGmTXUmiRJBd1fd7Wj3ej6q2ISOOVfVG36vL8Mb/1LxPR0j1BQaizjwcyk8SXBh+NZvYMo4RjTC0RdeyBHLjmtDO5t1nQjozwVF9s5iWdbKrO4O3qta2Dm5mJx1oNNCjw/n3iIkkPe2uii8TtJvm8SIK1HQ4U+rvgHBgr4/ECwVVxQcXiIh3ULP9q3dzH+FzQBLh4APTydn2whaZTJodvyBkdudIOU=
