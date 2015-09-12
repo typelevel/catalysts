@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/InTheNow/scala-bricks.png?label=ready&title=Ready)](https://waffle.io/InTheNow/scala-bricks)
 # Scala Bricks
 
 [![Build Status](https://api.travis-ci.org/InTheNow/scala-bricks.png)](https://travis-ci.org/InTheNow/scala-bricks)
