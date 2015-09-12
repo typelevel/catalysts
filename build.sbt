@@ -32,7 +32,7 @@ val scalatestVersion = "3.0.0-M7"
 val scalacVersion = "2.11.7"
 
 lazy val buildSettings = Seq(
-  organization := "InTheNow.github",
+  organization := "com.github.inthenow",
   scalaVersion := scalacVersion,
   crossScalaVersions := Seq("2.10.5", scalacVersion)
 )
