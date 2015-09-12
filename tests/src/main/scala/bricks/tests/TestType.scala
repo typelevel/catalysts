@@ -13,6 +13,5 @@ trait StdTest extends TestType {
 
 trait WellTested extends TestType {
   override def testType: TestModifier =
-    if (Platform.isJvm) TestModifier(0.1, 1.0)
-    else TestModifier(0.1, 1.0)
+    if (Platform.isJvm) TestModifier(0.1, 1.0) else TestModifier(0.1, 1.0)
 }

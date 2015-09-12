@@ -13,6 +13,5 @@ final object NormalTestMode extends TestMode {
 
 final object StressTestMode extends TestMode {
   def testMode: TestModifier = 
-    if (Platform.isJvm) TestModifier(1000, 100.0)
-    else TestModifier(100, 10.0)
+    if (Platform.isJvm) TestModifier(1000, 100.0) else TestModifier(100, 10.0)
 }

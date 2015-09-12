@@ -12,6 +12,18 @@ class StdTestTests extends TestSuite with scalatest.DisableTripleEquals {
     val max = if (Platform.isJvm) 5.0 else 50.0
     assert(generatorDrivenConfig.maxDiscardedFactor.value == max)
   }
+
+  test("StdTest names") {
+    assert(projectKey == "bricks")
+  }
+ 
+  test("StdTest arbitaryTry") {
+    import org.scalacheck.Arbitrary
+    import scala.util.Try
+
+    val ti = arbitraryTry(Arbitrary.arbInt)
+    assert(ti.isInstanceOf[Arbitrary[Try[Int]]])
+  }
 }
 
 class WellTestedTests extends TestSuite with WellTested {
