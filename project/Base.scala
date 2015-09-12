@@ -92,7 +92,7 @@ lazy val sharedReleaseProcess = Seq(
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
     inquireVersions,
-    //runClean, // disabled to reduce memory usage during release
+    runClean,
     runTest,
     setReleaseVersion,
     commitReleaseVersion,
