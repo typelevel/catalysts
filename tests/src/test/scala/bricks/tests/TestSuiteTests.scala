@@ -1,6 +1,9 @@
 package bricks
 package tests
 
+import bricks.scalatest.TestSuite
+import bricks.testkit.{StdTest, StressTestMode, TestModifier, TestNotifications, TestSettings, WellTested}
+
 class StdTestTests extends TestSuite with scalatest.DisableTripleEquals {
 
   test("StdTest minSuccessful") {
@@ -39,17 +42,15 @@ class WellTestedTests extends TestSuite with WellTested {
   }
 }
 
-import org.scalactic.anyvals.{PosZDouble, PosInt}
-
 class WellTestedCustomPlatformTests extends TestSuite with WellTested {
 
- override def minSuccessful: PosInt =
-    if (Platform.isJvm) PosInt(50)
-    else PosInt(5)
+ override def minSuccessful: Int =
+    if (Platform.isJvm) 50
+    else 5
 
-  override def maxDiscardedFactor: PosZDouble =
-    if (Platform.isJvm) PosZDouble(2.0)
-    else PosZDouble(20.0)
+  override def maxDiscardedFactor: Double =
+    if (Platform.isJvm) 2.0
+    else 20.0
 
   override def testType: TestModifier =
     if (Platform.isJvm) TestModifier(0.1, 0.5)
@@ -70,13 +71,13 @@ trait MySetup extends TestSettings with StdTest with TestNotifications {
 
   override  def shouldNotify: Boolean = false
 
-  override def minSuccessful: PosInt =
-    if (Platform.isJvm) PosInt(50)
-    else PosInt(5)
+  override def minSuccessful: Int =
+    if (Platform.isJvm) 50
+    else 5
 
-  override def maxDiscardedFactor: PosZDouble =
-    if (Platform.isJvm) PosZDouble(2.0)
-    else PosZDouble(20.0)
+  override def maxDiscardedFactor: Double =
+    if (Platform.isJvm) 2.0
+    else 20.0
 
   override def testType: TestModifier =
     if (Platform.isJvm) TestModifier(0.1, 0.5)
@@ -113,13 +114,11 @@ class StressTestModeTest extends TestSuite {
 
 trait MyStressSetup extends TestSettings with StdTest with TestNotifications {
 
-  override def minSuccessful: PosInt =
-    if (Platform.isJvm) PosInt(45)
-    else PosInt(7)
+  override def minSuccessful: Int =
+    if (Platform.isJvm) 45 else 7
 
-  override def maxDiscardedFactor: PosZDouble =
-    if (Platform.isJvm) PosZDouble(4.0)
-    else PosZDouble(14.0)
+  override def maxDiscardedFactor: Double =
+    if (Platform.isJvm) 4.0 else 14.0
 
   override def testType: TestModifier =
     if (Platform.isJvm) TestModifier(0.4, 0.7)
@@ -147,3 +146,4 @@ class MyStressTestModeTest extends TestSuite with MyStressSetup {
     assert(generatorDrivenConfig.maxDiscardedFactor.value == max)
   }
 }
+ 

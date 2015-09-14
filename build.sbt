@@ -10,9 +10,9 @@ import ScoverageSbtPlugin._
  * These aliases serialise the build for the benefit of Travis-CI, also useful for pre-PR testing.
  * If new projects are added to the build, these must be updated.
  */
-addCommandAlias("buildJVM", ";macrosJVM/compile;platformJVM/compile;lawsJVM/compile;scalatestJVM/compile;testsJVM/test")
+addCommandAlias("buildJVM", ";macrosJVM/compile;platformJVM/compile;scalatestJVM/test;specs2/test;testkitJVM/compile;testsJVM/test")
 addCommandAlias("validateJVM", ";scalastyle;buildJVM")
-addCommandAlias("validateJS", ";macrosJS/compile;platformJS/compile;lawsJS/compile;scalatestJS/compile;testsJS/test")
+addCommandAlias("validateJS", ";macrosJS/compile;platformJS/compile;scalatestJS/test;testkitJS/compile;testsJS/test")
 addCommandAlias("validate", ";validateJS;validateJVM")
 addCommandAlias("validateAll", s";++$scalacVersion;+clean;+validate;++$scalacVersion;docs/makeSite") 
 
@@ -30,9 +30,10 @@ val paradiseVersion = "2.1.0-M5"
 val scalacheckVersion = "1.12.4"
 val scalatestVersion = "3.0.0-M7"
 val scalacVersion = "2.11.7"
+val specs2Version = "3.6.4"
 
 lazy val buildSettings = Seq(
-  organization := "com.github.inthenow",
+  organization := "org.typelevel",
   scalaVersion := scalacVersion,
   crossScalaVersions := Seq("2.10.5", scalacVersion)
 )
@@ -71,15 +72,15 @@ lazy val bricksJVM = project.in(file(".bricksJVM"))
   .settings(moduleName := "bricks")
   .settings(bricksSettings)
   .settings(commonJvmSettings)
-  .aggregate(macrosJVM, platformJVM, lawsJVM, scalatestJVM, testsJVM, docs)
-  .dependsOn(macrosJVM, platformJVM, lawsJVM, scalatestJVM, testsJVM % "compile;test-internal -> test")
+  .aggregate(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM, docs)
+  .dependsOn(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM % "compile;test-internal -> test")
 
 lazy val bricksJS = project.in(file(".bricksJS"))
   .settings(moduleName := "bricks")
   .settings(bricksSettings)
   .settings(commonJsSettings)
-  .aggregate(macrosJS, platformJS, lawsJS, testsJS)
-  .dependsOn(macrosJS, platformJS, lawsJS, scalatestJS, testsJS % "test-internal -> test")
+  .aggregate(macrosJS, platformJS, scalatestJS, testkitJS, testsJS)
+  .dependsOn(macrosJS, platformJS, scalatestJS, testsJS % "test-internal -> test")
   .enablePlugins(ScalaJSPlugin)
 
 /**
@@ -111,26 +112,13 @@ lazy val platformJVM = platform.jvm
 lazy val platformJS = platform.js
 
 /**
- * Laws - cross project that defines macros the laws for all other projects
- */
-lazy val laws = crossProject.crossType(CrossType.Pure)
-  .dependsOn(macros, platform)
-  .settings(moduleName := "bricks-laws")
-  .settings(bricksSettings:_*)
-  .settings(disciplineDependencies:_*)
-  .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion)
-  .jsSettings(commonJsSettings:_*)
-  .jvmSettings(commonJvmSettings:_*)
-
-lazy val lawsJVM = laws.jvm
-lazy val lawsJS = laws.js
-
-/**
  * Scalatest - cross project that defines test utilities for scalatest
  */
 lazy val scalatest = crossProject.crossType(CrossType.Pure)
+  .dependsOn(testkit)
   .settings(moduleName := "bricks-scalatest")
   .settings(bricksSettings:_*)
+  .settings(disciplineDependencies:_*)
   .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion)
   .jsSettings(commonJsSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
@@ -139,14 +127,41 @@ lazy val scalatestJVM = scalatest.jvm
 lazy val scalatestJS = scalatest.js
 
 /**
+ * Specs2 - JVM project that defines test utilities for specs2
+ */
+lazy val specs2 = project
+  .dependsOn(testkitJVM)
+  .settings(moduleName := "bricks-specs2")
+  .settings(bricksSettings:_*)
+  .settings(disciplineDependencies:_*)
+  .settings(libraryDependencies += "org.specs2" %% "specs2-core" % specs2Version)
+  .settings(libraryDependencies += "org.specs2" %% "specs2-scalacheck" % specs2Version)
+  .settings(commonJvmSettings:_*)
+
+/**
+ * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
+ *         all the tests for this build.
+ */
+lazy val testkit = crossProject.crossType(CrossType.Pure)
+  .dependsOn(macros, platform)
+  .settings(moduleName := "bricks-testkit")
+  .settings(bricksSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+  .jvmSettings(commonJvmSettings:_*)
+
+lazy val testkitJVM = testkit.jvm
+lazy val testkitJS = testkit.js
+
+
+/**
  * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
  *         all the tests for this build.
  */
 lazy val tests = crossProject.crossType(CrossType.Pure)
-  .dependsOn(macros, platform, laws, scalatest % "test-internal -> test")
+  .dependsOn(macros, platform, testkit, scalatest % "test-internal -> test")
   .settings(moduleName := "bricks-tests")
   .settings(bricksSettings:_*)
-  .settings(disciplineDependencies:_*)
+  .settings(noPublishSettings:_*)
   .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test")
   .jsSettings(commonJsSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
@@ -171,11 +186,11 @@ lazy val docs = project
   .settings(doctestTestFramework := DoctestTestFramework.ScalaTest)
   .settings(doctestWithDependencies := false)
   .settings(commonJvmSettings)
-  .dependsOn(platformJVM, lawsJVM, testsJVM)
+  .dependsOn(platformJVM, macrosJVM, scalatestJVM, specs2, testkitJVM)
 
 lazy val docSettings = Seq(
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(platformJVM, lawsJVM, macrosJVM, scalatestJVM, testsJVM),
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(platformJVM, macrosJVM, scalatestJVM, specs2, testkitJVM),
   site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
   site.addMappingsToSiteDir(tut, "_tut"),
   ghpagesNoJekyll := false,

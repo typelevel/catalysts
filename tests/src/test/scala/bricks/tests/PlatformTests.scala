@@ -1,6 +1,9 @@
 package bricks
 package tests
 
+
+import bricks.scalatest.TestSuite
+
 class PlatformTests extends TestSuite {
 
   def hackyIsJS(): Boolean = 1.0.toString == "1"
@@ -20,3 +23,4 @@ class PlatformTests extends TestSuite {
     assert(hackyIsJS != hackyIsJVM)
   }
 }
+

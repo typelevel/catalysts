@@ -3,9 +3,10 @@ package tests
 
 import org.typelevel.discipline.{Laws, Predicate}
 import bricks.macros._
-import org.scalacheck.Prop
+import bricks.testkit.{StdTest, TestModifier, TestNotifications, TestSettings, WellTested}
 import org.scalacheck.Gen.Parameters
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Prop}
+import bricks.scalatest.TestSuite
 
 class LawTests extends TestSuite {
   implicit def groupLaws[A: Arbitrary] = GroupLaws[A]
@@ -77,3 +78,4 @@ trait GroupLaws[A] extends Laws {
     val bases = Seq("base" → base)
   }
 }
+ 

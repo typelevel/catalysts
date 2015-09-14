@@ -1,14 +1,13 @@
 package bricks
-package tests
+package scalatest
 
 import bricks.macros.ClassInfo._
 import bricks.macros._
-import bricks.scalatest.TestSuite
 
 class MacroTests extends TestSuite {
 
   test("Test className") {
-    assert(className(this) == "bricks.tests.MacroTests")
+    assert(className(this) == "bricks.scalatest.MacroTests")
   }
 
   test("Test TypeTagM") {

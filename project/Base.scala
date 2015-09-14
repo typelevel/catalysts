@@ -30,6 +30,11 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
     }
   }
 
+ def scalaMacrosParadise(version: String): Seq[Setting[_]] = Seq(
+   libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
+   libraryDependencies += compilerPlugin("org.scalamacros" %% "paradise" % version cross CrossVersion.full)
+ )
+
   def scalaMacroDependencies(version: String): Seq[Setting[_]] = Seq(
   libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
   libraryDependencies ++= {
