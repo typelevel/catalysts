@@ -27,5 +27,4 @@ class MacroTests extends TestSuite {
     def e1 = f1[List[Map[Int, Double]]] must beEqualTo(expected)
     def e2 = f2[List[Map[Int, Double]]] must beEqualTo(expected)
     def e3 = f3[List[Map[Int, Double]]] must beEqualTo(expected)
-  
 }

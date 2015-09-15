@@ -130,7 +130,7 @@ lazy val scalatestJS = scalatest.js
  * Specs2 - JVM project that defines test utilities for specs2
  */
 lazy val specs2 = project
-  .dependsOn(testkitJVM)
+  .dependsOn(testkitJVM, testsJVM % "test-internal -> compile")
   .settings(moduleName := "bricks-specs2")
   .settings(bricksSettings:_*)
   .settings(disciplineDependencies:_*)
@@ -161,6 +161,7 @@ lazy val tests = crossProject.crossType(CrossType.Pure)
   .dependsOn(macros, platform, testkit, scalatest % "test-internal -> test")
   .settings(moduleName := "bricks-tests")
   .settings(bricksSettings:_*)
+  .settings(disciplineDependencies:_*)
   .settings(noPublishSettings:_*)
   .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test")
   .jsSettings(commonJsSettings:_*)

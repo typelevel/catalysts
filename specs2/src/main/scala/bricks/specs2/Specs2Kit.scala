@@ -10,4 +10,5 @@ trait Specs2Kit extends TestKit {
   type Params = Parameters
   type Laws = DisciplineLaws
   type RuleSet = DisciplineLaws#RuleSet
+  type Structure = org.specs2.specification.core.SpecStructure
 }

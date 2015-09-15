@@ -10,4 +10,5 @@ trait ScalatestKit extends TestKit {
   type Params = PropertyCheckConfiguration
   type Laws = DisciplineLaws
   type RuleSet = DisciplineLaws#RuleSet
+  type Structure = Unit
 }

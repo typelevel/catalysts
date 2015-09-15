@@ -7,4 +7,5 @@ trait TestKit {
   type Laws
   type Params
   type RuleSet
+  type Structure
 }

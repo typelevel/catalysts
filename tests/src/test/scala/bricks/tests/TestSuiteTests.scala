@@ -22,10 +22,21 @@ class StdTestTests extends TestSuite with scalatest.DisableTripleEquals {
  
   test("StdTest arbitaryTry") {
     import org.scalacheck.Arbitrary
+    import org.scalacheck.Arbitrary.arbitrary
     import scala.util.Try
 
     val ti = arbitraryTry(Arbitrary.arbInt)
     assert(ti.isInstanceOf[Arbitrary[Try[Int]]])
+    for(i <- 0 until 100) ti.arbitrary.sample
+  }
+
+  test("StdTest convertToEqualizer") {
+    try {
+      val x = convertToEqualizer(1)
+      assert(false)
+    } catch {
+      case e: Throwable => assert(true)
+    }
   }
 }
 

@@ -17,7 +17,7 @@ trait LawChecks[Tk <: TestKit] {
    * Check the `laws` using `name` as the base name for the tests. 
    */
   case class LawChecker[L <: Tk#Laws](name: String, laws: L) {
-    def check(f: L => Tk#RuleSet): Unit = checkAllLaws(name, f(laws))
+    def check(f: L => Tk#RuleSet): Tk#Structure = checkAllLaws(name, f(laws))
   }
 
   /**
@@ -40,6 +40,6 @@ trait LawChecks[Tk <: TestKit] {
   def laws[L[_] <: Tk#Laws, A](implicit laws: L[A], tag: TypeTagM[A]): LawChecker[L[A]] =
     LawChecker("[" + tag.name + "]", laws)
 
-  def checkAllLaws(name: String, ruleSet: Tk#RuleSet): Unit
+  def checkAllLaws(name: String, ruleSet: Tk#RuleSet): Tk#Structure
 }
 
