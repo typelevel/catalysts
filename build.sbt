@@ -19,9 +19,9 @@ addCommandAlias("validateAll", s";++$scalacVersion;+clean;+validate;++$scalacVer
 /**
  * Build settings
  */
-val home = "https://github.com/InTheNow/scala-bricks"
-val repo = "git@github.com:InTheNow/scala-bricks.git"
-val api = "https://InTheNow.github.io/scala-bricks/api/"
+val home = "https://github.com/InTheNow/catalysts"
+val repo = "git@github.com:InTheNow/catalysts.git"
+val api = "https://InTheNow.github.io/catalysts/api/"
 val license = ("Apache License", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
 val disciplineVersion = "0.4"
@@ -56,28 +56,28 @@ lazy val commonJvmSettings = Seq(
 )
 
 /**
- * Bricks - This is the root project that aggregates the bricksJVM and bricksJS sub projects
+ * catalysts - This is the root project that aggregates the catalystsJVM and catalystsJS sub projects
  */
-lazy val bricksSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
+lazy val catalystsSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
 
-lazy val bricks = project.in(file("."))
+lazy val catalysts = project.in(file("."))
   .settings(moduleName := "root")
-  .settings(bricksSettings)
+  .settings(catalystsSettings)
   .settings(noPublishSettings)
-  .settings(console <<= console in (bricksJVM, Compile))
-  .aggregate(bricksJVM, bricksJS)
-  .dependsOn(bricksJVM, bricksJS, testsJVM % "test-internal -> test")
+  .settings(console <<= console in (catalystsJVM, Compile))
+  .aggregate(catalystsJVM, catalystsJS)
+  .dependsOn(catalystsJVM, catalystsJS, testsJVM % "test-internal -> test")
 
-lazy val bricksJVM = project.in(file(".bricksJVM"))
-  .settings(moduleName := "bricks")
-  .settings(bricksSettings)
+lazy val catalystsJVM = project.in(file(".catalystsJVM"))
+  .settings(moduleName := "catalysts")
+  .settings(catalystsSettings)
   .settings(commonJvmSettings)
   .aggregate(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM, docs)
   .dependsOn(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM % "compile;test-internal -> test")
 
-lazy val bricksJS = project.in(file(".bricksJS"))
-  .settings(moduleName := "bricks")
-  .settings(bricksSettings)
+lazy val catalystsJS = project.in(file(".catalystsJS"))
+  .settings(moduleName := "catalysts")
+  .settings(catalystsSettings)
   .settings(commonJsSettings)
   .aggregate(macrosJS, platformJS, scalatestJS, testkitJS, testsJS)
   .dependsOn(macrosJS, platformJS, scalatestJS, testsJS % "test-internal -> test")
@@ -87,8 +87,8 @@ lazy val bricksJS = project.in(file(".bricksJS"))
  * Macros - cross project that defines macros
  */
 lazy val macros = crossProject.crossType(CrossType.Pure)
-  .settings(moduleName := "bricks-macros")
-  .settings(bricksSettings:_*)
+  .settings(moduleName := "catalysts-macros")
+  .settings(catalystsSettings:_*)
   .settings(libraryDependencies += "org.typelevel" %%% "macro-compat" % macroCompatVersion % "compile")
   .settings(scalaMacroDependencies(paradiseVersion):_*)
   .jsSettings(commonJsSettings:_*)
@@ -102,8 +102,8 @@ lazy val macrosJS = macros.js
  */
 lazy val platform = crossProject.crossType(CrossType.Dummy)
   .dependsOn(macros)
-  .settings(moduleName := "bricks-platform")
-  .settings(bricksSettings:_*)
+  .settings(moduleName := "catalysts-platform")
+  .settings(catalystsSettings:_*)
   .settings(scalaMacroDependencies(paradiseVersion):_*)
   .jsSettings(commonJsSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
@@ -116,8 +116,8 @@ lazy val platformJS = platform.js
  */
 lazy val scalatest = crossProject.crossType(CrossType.Pure)
   .dependsOn(testkit)
-  .settings(moduleName := "bricks-scalatest")
-  .settings(bricksSettings:_*)
+  .settings(moduleName := "catalysts-scalatest")
+  .settings(catalystsSettings:_*)
   .settings(disciplineDependencies:_*)
   .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion)
   .jsSettings(commonJsSettings:_*)
@@ -131,8 +131,8 @@ lazy val scalatestJS = scalatest.js
  */
 lazy val specs2 = project
   .dependsOn(testkitJVM, testsJVM % "test-internal -> compile")
-  .settings(moduleName := "bricks-specs2")
-  .settings(bricksSettings:_*)
+  .settings(moduleName := "catalysts-specs2")
+  .settings(catalystsSettings:_*)
   .settings(disciplineDependencies:_*)
   .settings(libraryDependencies += "org.specs2" %% "specs2-core" % specs2Version)
   .settings(libraryDependencies += "org.specs2" %% "specs2-scalacheck" % specs2Version)
@@ -144,8 +144,8 @@ lazy val specs2 = project
  */
 lazy val testkit = crossProject.crossType(CrossType.Pure)
   .dependsOn(macros, platform)
-  .settings(moduleName := "bricks-testkit")
-  .settings(bricksSettings:_*)
+  .settings(moduleName := "catalysts-testkit")
+  .settings(catalystsSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
 
@@ -159,8 +159,8 @@ lazy val testkitJS = testkit.js
  */
 lazy val tests = crossProject.crossType(CrossType.Pure)
   .dependsOn(macros, platform, testkit, scalatest % "test-internal -> test")
-  .settings(moduleName := "bricks-tests")
-  .settings(bricksSettings:_*)
+  .settings(moduleName := "catalysts-tests")
+  .settings(catalystsSettings:_*)
   .settings(disciplineDependencies:_*)
   .settings(noPublishSettings:_*)
   .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test")
@@ -174,8 +174,8 @@ lazy val testsJS = tests.js
  * Docs - Generates and publishes the scaladoc API documents and the project web site 
  */
 lazy val docs = project
-  .settings(moduleName := "bricks-docs")
-  .settings(bricksSettings)
+  .settings(moduleName := "catalysts-docs")
+  .settings(catalystsSettings)
   .settings(noPublishSettings)
   .settings(unidocSettings)
   .settings(site.settings)
@@ -230,5 +230,5 @@ lazy val scoverageSettings = Seq(
   ScoverageKeys.coverageMinimum := 60,
   ScoverageKeys.coverageFailOnMinimum := false,
   ScoverageKeys.coverageHighlighting := scalaBinaryVersion.value != "2.10"
- // ScoverageKeys.coverageExcludedPackages := "bricks\\.bench\\..*"
+ // ScoverageKeys.coverageExcludedPackages := "catalysts\\.bench\\..*"
 )
