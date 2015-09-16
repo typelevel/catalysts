@@ -1,11 +1,11 @@
 ### GENERAL SETTINGS ###
 
 # Site settings
-title: Scala Bricks.
+title: Catalysts.
 description: "An intentionally small library of small building blocks to help build platform independent Scala projects with SBT."
 analytics: #Google analytics code in the format XX-nnnnnnnn-n
-baseurl: "/scala-bricks"
-url: "https://InTheNow.github.io/scala-bricks"
+baseurl: "/catalysts"
+url: "https://InTheNow.github.io/catalysts"
 
 # Build settings
 markdown: kramdown
