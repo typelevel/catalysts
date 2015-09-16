@@ -1,12 +1,12 @@
-# Scala Bricks
+# Catalysts
 
-[![Build Status](https://api.travis-ci.org/InTheNow/scala-bricks.png)](https://travis-ci.org/InTheNow/scala-bricks)
+[![Build Status](https://api.travis-ci.org/InTheNow/catalysts.png)](https://travis-ci.org/InTheNow/catalysts)
 [![Join the chat at
-https://gitter.im/InTheNow/scala-bricks](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/InTheNow/scala-bricks?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Stories in Ready](https://badge.waffle.io/InTheNow/scala-bricks.png?label=ready&title=Ready)](https://waffle.io/InTheNow/scala-bricks)
-[![codecov.io](http://codecov.io/github/InTheNow/scala-bricks/coverage.svg?branch=master)](http://codecov.io/github/InTheNow/scala-bricks?branch=master)
+https://gitter.im/InTheNow/catalysts](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/InTheNow/catalysts?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Stories in Ready](https://badge.waffle.io/InTheNow/catalysts.png?label=ready&title=Ready)](https://waffle.io/InTheNow/catalysts)
+[![codecov.io](http://codecov.io/github/InTheNow/catalysts/coverage.svg?branch=master)](http://codecov.io/github/InTheNow/catalysts?branch=master)
 
-Scala Bricks is an intentionally small library of small building blocks to help build platform independent Scala projects with SBT.
+Catalysts is an intentionally small library of small building blocks to help build platform independent Scala projects with SBT.
 
 Please note that this is all __WORK IN PROCESS__, so is not yet ready for production use, as evident by the lack of documentaion, credits, attributions and so on. 
 
@@ -27,10 +27,10 @@ relax this to a single sign-off.
 
 ### Contributing
 
-Discussion around Scala Bricks is currently happening in the
-[Gitter channel](https://gitter.im/InTheNow/scala-bricks) as well as on Github
+Discussion around Catalysts is currently happening in the
+[Gitter channel](https://gitter.im/InTheNow/catalysts) as well as on Github
 issue and PR pages. You can get an overview of who is working on what
-via [Waffle.io](https://waffle.io/InTheNow/scala-bricks).
+via [Waffle.io](https://waffle.io/InTheNow/catalysts).
 
 Feel free to open an issue if you notice a bug, have an idea for a
 feature, or have a question about the code. Pull requests are also
@@ -38,7 +38,7 @@ gladly accepted.
 
 People are expected to follow the
 [Typelevel Code of Conduct](http://typelevel.org/conduct.html) when
-discussing Scala Bricks on the Github page, Gitter channel, or other
+discussing Catalysts on the Github page, Gitter channel, or other
 venues.
 
 We hope that our community will be respectful, helpful, and kind. If
@@ -53,7 +53,7 @@ immediately so that we can support you.
 
 ## License
 
-Scala Bricks is licensed under the **[Apache License, Version 2.0][apache]** (the
+Catalysts is licensed under the **[Apache License, Version 2.0][apache]** (the
 "License"); you may not use this software except in compliance with the License.
 
 Unless required by applicable law or agreed to in writing, software
