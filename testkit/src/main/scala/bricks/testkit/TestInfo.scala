@@ -1,5 +1,5 @@
 package bricks
-package tests
+package testkit
 
 import bricks.macros.ClassInfo._
 
