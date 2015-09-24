@@ -19,6 +19,7 @@ The current maintainers (people who can merge pull requests) are:
  * [InTheNow](https://github.com/InTheNow) Alistair Johnson
  * [non](https://github.com/non) Erik Osheim
  * [milessabin](https://github.com/milessabin) Miles Sabin
+ * [dwijnand](https://github.com/dwijnand) Dale Wijnand
 
 We are currently following a practice of requiring at least two
 sign-offs to merge PRs (and for large or contentious issues we may
