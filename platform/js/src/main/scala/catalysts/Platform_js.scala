@@ -1,18 +1,9 @@
 package catalysts
 
-import scala.reflect.macros.whitebox
-import macrocompat.bundle
-
 object Platform {
-  def isJvm: Boolean = macro PlatformMacros.isJvmImpl
-  def isJs: Boolean = macro PlatformMacros.isJsImpl
-}
-
-@bundle
-class PlatformMacros(val c: whitebox.Context) {
-  import c.universe._
-
-  def isJvmImpl: c.Expr[Boolean] = c.Expr(Literal(Constant(false)))
-
-  def isJsImpl: c.Expr[Boolean] = c.Expr(Literal(Constant(true)))
+  // using `final val` makes compiler constant-fold any use of these values, dropping dead code automatically
+  // $COVERAGE-OFF$
+  final val isJvm = false
+  final val isJs = true
+  // $COVERAGE-ON$
 }
