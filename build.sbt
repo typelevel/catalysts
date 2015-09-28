@@ -104,7 +104,6 @@ lazy val platform = crossProject.crossType(CrossType.Dummy)
   .dependsOn(macros)
   .settings(moduleName := "catalysts-platform")
   .settings(catalystsSettings:_*)
-  .settings(scalaMacroDependencies(paradiseVersion):_*)
   .jsSettings(commonJsSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
 
