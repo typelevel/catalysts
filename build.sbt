@@ -1,10 +1,4 @@
 import Base._
-import com.typesafe.sbt.pgp.PgpKeys.publishSigned
-import com.typesafe.sbt.SbtSite.SiteKeys._
-import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
-import sbtunidoc.Plugin.UnidocKeys._
-import ReleaseTransformations._
-import ScoverageSbtPlugin._
 
 /**
  * These aliases serialise the build for the benefit of Travis-CI, also useful for pre-PR testing.
@@ -14,28 +8,25 @@ addCommandAlias("buildJVM", ";macrosJVM/compile;platformJVM/compile;scalatestJVM
 addCommandAlias("validateJVM", ";scalastyle;buildJVM")
 addCommandAlias("validateJS", ";macrosJS/compile;platformJS/compile;scalatestJS/test;testkitJS/compile;testsJS/test")
 addCommandAlias("validate", ";validateJS;validateJVM")
-addCommandAlias("validateAll", s";++$scalacVersion;+clean;+validate;++$scalacVersion;docs/makeSite") 
+addCommandAlias("validateAll", s""";++${vers->"scalac"};+clean;+validate;++${vers->"scalac"};docs/makeSite""") 
 
 /**
  * Build settings
  */
-val home = "https://github.com/InTheNow/catalysts"
-val repo = "git@github.com:InTheNow/catalysts.git"
-val api = "https://InTheNow.github.io/catalysts/api/"
+val proj    = "catalysts"
+val home    = "https://github.com/InTheNow/catalysts"
+val repo    = "git@github.com:InTheNow/catalysts.git"
+val api     = "https://InTheNow.github.io/catalysts/api/"
 val license = ("Apache License", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+val devs    = Seq(Dev("Alistair Johnson", "inthenow"))
 
-val disciplineVersion = "0.4"
-val macroCompatVersion = "1.0.0"
-val paradiseVersion = "2.1.0-M5"
-val scalacheckVersion = "1.12.4"
-val scalatestVersion = "3.0.0-M7"
-val scalacVersion = "2.11.7"
-val specs2Version = "3.6.4"
+// Example to add/overide versions: val vers = versions + ("discipline" -> "0.3")
+val vers = versions
 
 lazy val buildSettings = Seq(
   organization := "org.typelevel",
-  scalaVersion := scalacVersion,
-  crossScalaVersions := Seq("2.10.5", scalacVersion)
+  scalaVersion := vers->"scalac",
+  crossScalaVersions := Seq("2.10.5", scalaVersion.value)
 )
 
 /**
@@ -44,7 +35,6 @@ lazy val buildSettings = Seq(
 lazy val commonSettings = sharedCommonSettings ++ Seq(
   scalacOptions ++= commonScalacOptions,
   parallelExecution in Test := false
-  // resolvers += Resolver.sonatypeRepo("snapshots")
 ) ++ warnUnusedImport ++ unidocCommonSettings
 
 lazy val commonJsSettings = Seq(
@@ -60,39 +50,31 @@ lazy val commonJvmSettings = Seq(
  */
 lazy val catalystsSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
 
-lazy val catalysts = project.in(file("."))
-  .settings(moduleName := "root")
-  .settings(catalystsSettings)
-  .settings(noPublishSettings)
-  .settings(console <<= console in (catalystsJVM, Compile))
+lazy val catalystsConfig = mkConfig(catalystsSettings, commonJvmSettings, commonJsSettings)
+
+lazy val catalysts = project
+  .configure(mkRootConfig(catalystsSettings,catalystsJVM))
   .aggregate(catalystsJVM, catalystsJS)
   .dependsOn(catalystsJVM, catalystsJS, testsJVM % "test-internal -> test")
 
-lazy val catalystsJVM = project.in(file(".catalystsJVM"))
-  .settings(moduleName := "catalysts")
-  .settings(catalystsSettings)
-  .settings(commonJvmSettings)
+lazy val catalystsJVM = project
+  .configure(mkRootJvmConfig(proj, catalystsSettings, commonJvmSettings))
   .aggregate(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM, docs)
   .dependsOn(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM % "compile;test-internal -> test")
 
-lazy val catalystsJS = project.in(file(".catalystsJS"))
-  .settings(moduleName := "catalysts")
-  .settings(catalystsSettings)
-  .settings(commonJsSettings)
+lazy val catalystsJS = project
+  .configure(mkRootJsConfig(proj, catalystsSettings, commonJsSettings))
   .aggregate(macrosJS, platformJS, scalatestJS, testkitJS, testsJS)
   .dependsOn(macrosJS, platformJS, scalatestJS, testsJS % "test-internal -> test")
-  .enablePlugins(ScalaJSPlugin)
 
 /**
  * Macros - cross project that defines macros
  */
 lazy val macros = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "catalysts-macros")
-  .settings(catalystsSettings:_*)
-  .settings(libraryDependencies += "org.typelevel" %%% "macro-compat" % macroCompatVersion % "compile")
-  .settings(scalaMacroDependencies(paradiseVersion):_*)
-  .jsSettings(commonJsSettings:_*)
-  .jvmSettings(commonJvmSettings:_*)
+  .configure(catalystsConfig)
+  .settings(libraryDependencies += "org.typelevel" %%% "macro-compat" % (vers->"macro-compat")  % "compile")
+  .settings(scalaMacroDependencies(vers->"paradise"):_*)
 
 lazy val macrosJVM = macros.jvm
 lazy val macrosJS = macros.js
@@ -102,10 +84,8 @@ lazy val macrosJS = macros.js
  */
 lazy val platform = crossProject.crossType(CrossType.Dummy)
   .dependsOn(macros)
+  .configure(catalystsConfig)
   .settings(moduleName := "catalysts-platform")
-  .settings(catalystsSettings:_*)
-  .jsSettings(commonJsSettings:_*)
-  .jvmSettings(commonJvmSettings:_*)
 
 lazy val platformJVM = platform.jvm
 lazy val platformJS = platform.js
@@ -115,12 +95,10 @@ lazy val platformJS = platform.js
  */
 lazy val scalatest = crossProject.crossType(CrossType.Pure)
   .dependsOn(testkit)
+  .configure(catalystsConfig)
   .settings(moduleName := "catalysts-scalatest")
-  .settings(catalystsSettings:_*)
   .settings(disciplineDependencies:_*)
-  .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion)
-  .jsSettings(commonJsSettings:_*)
-  .jvmSettings(commonJvmSettings:_*)
+  .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % vers.get("scalatest").get )
 
 lazy val scalatestJVM = scalatest.jvm
 lazy val scalatestJS = scalatest.js
@@ -133,24 +111,21 @@ lazy val specs2 = project
   .settings(moduleName := "catalysts-specs2")
   .settings(catalystsSettings:_*)
   .settings(disciplineDependencies:_*)
-  .settings(libraryDependencies += "org.specs2" %% "specs2-core" % specs2Version)
-  .settings(libraryDependencies += "org.specs2" %% "specs2-scalacheck" % specs2Version)
+  .settings(libraryDependencies += "org.specs2" %% "specs2-core" % (vers->"specs2"))
+  .settings(libraryDependencies += "org.specs2" %% "specs2-scalacheck" % (vers->"specs2"))
   .settings(commonJvmSettings:_*)
 
 /**
- * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
+ * Testkit - cross project that defines test utilities that can be re-used in other libraries, as well as 
  *         all the tests for this build.
  */
 lazy val testkit = crossProject.crossType(CrossType.Pure)
   .dependsOn(macros, platform)
   .settings(moduleName := "catalysts-testkit")
-  .settings(catalystsSettings:_*)
-  .jsSettings(commonJsSettings:_*)
-  .jvmSettings(commonJvmSettings:_*)
+  .configure(catalystsConfig)
 
 lazy val testkitJVM = testkit.jvm
 lazy val testkitJS = testkit.js
-
 
 /**
  * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
@@ -159,12 +134,10 @@ lazy val testkitJS = testkit.js
 lazy val tests = crossProject.crossType(CrossType.Pure)
   .dependsOn(macros, platform, testkit, scalatest % "test-internal -> test")
   .settings(moduleName := "catalysts-tests")
-  .settings(catalystsSettings:_*)
+  .configure(catalystsConfig)
   .settings(disciplineDependencies:_*)
   .settings(noPublishSettings:_*)
-  .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test")
-  .jsSettings(commonJsSettings:_*)
-  .jvmSettings(commonJvmSettings:_*)
+  .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % (vers->"scalatest") % "test")
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
@@ -173,62 +146,18 @@ lazy val testsJS = tests.js
  * Docs - Generates and publishes the scaladoc API documents and the project web site 
  */
 lazy val docs = project
-  .settings(moduleName := "catalysts-docs")
-  .settings(catalystsSettings)
-  .settings(noPublishSettings)
-  .settings(unidocSettings)
-  .settings(site.settings)
-  .settings(ghpages.settings)
-  .settings(docSettings)
-  .settings(tutSettings)
-  .settings(tutScalacOptions ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))))
-  .settings(doctestSettings)
-  .settings(doctestTestFramework := DoctestTestFramework.ScalaTest)
-  .settings(doctestWithDependencies := false)
-  .settings(commonJvmSettings)
-  .dependsOn(platformJVM, macrosJVM, scalatestJVM, specs2, testkitJVM)
-
-lazy val docSettings = Seq(
-  organization  := "com.github.inthenow",
-  autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(platformJVM, macrosJVM, scalatestJVM, specs2, testkitJVM),
-  site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
-  site.addMappingsToSiteDir(tut, "_tut"),
-  ghpagesNoJekyll := false,
- // siteMappings += file("CONTRIBUTING.md") -> "contributing.md",
-  scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
-    "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
-    "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath,
-    "-diagrams"
-  ),
-  git.remoteRepo := repo,
-  includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
-)
+  .configure(mkDocConfig(proj, repo, "com.github.inthenow", catalystsSettings, commonJvmSettings,
+    platformJVM, macrosJVM, scalatestJVM, specs2, testkitJVM ))
 
 /**
  * Plugin and other settings
  */
 lazy val disciplineDependencies = Seq(
-  libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalacheckVersion,
-  libraryDependencies += "org.typelevel" %%% "discipline" % disciplineVersion
+  libraryDependencies += "org.scalacheck" %%% "scalacheck" % (vers->"scalacheck"),
+  libraryDependencies += "org.typelevel" %%% "discipline" % (vers->"discipline")
 )
 
-lazy val publishSettings = sharedPublishSettings(home, repo, api, license) ++ Seq(
-  autoAPIMappings := true,
-  pomExtra := (
-    <developers>
-      <developer>
-        <id>inthenow</id>
-        <name>Alistair Johnson</name>
-        <url>http://github.com/InTheNow/</url>
-      </developer>
-    </developers>
-  )
-) ++ credentialSettings ++ sharedReleaseProcess
+lazy val publishSettings = sharedPublishSettings(home, repo, api, license, devs) ++ 
+    credentialSettings ++ sharedReleaseProcess
 
-lazy val scoverageSettings = Seq(
-  ScoverageKeys.coverageMinimum := 60,
-  ScoverageKeys.coverageFailOnMinimum := false,
-  ScoverageKeys.coverageHighlighting := scalaBinaryVersion.value != "2.10"
- // ScoverageKeys.coverageExcludedPackages := "catalysts\\.bench\\..*"
-)
+lazy val scoverageSettings = sharedScoverageSettings(60)
