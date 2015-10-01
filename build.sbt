@@ -1,37 +1,121 @@
-import Base._
-
+import sbtcatalysts.Base._
+import org.typelevel.Dependencies._
 /**
  * These aliases serialise the build for the benefit of Travis-CI, also useful for pre-PR testing.
  * If new projects are added to the build, these must be updated.
  */
-addCommandAlias("buildJVM", ";macrosJVM/compile;platformJVM/compile;scalatestJVM/test;specs2/test;testkitJVM/compile;testsJVM/test")
+addCommandAlias("buildJVM",    ";macrosJVM/compile;platformJVM/compile;scalatestJVM/test;specs2/test;testkitJVM/compile;testsJVM/test")
 addCommandAlias("validateJVM", ";scalastyle;buildJVM")
-addCommandAlias("validateJS", ";macrosJS/compile;platformJS/compile;scalatestJS/test;testkitJS/compile;testsJS/test")
-addCommandAlias("validate", ";validateJS;validateJVM")
-addCommandAlias("validateAll", s""";++${vers->"scalac"};+clean;+validate;++${vers->"scalac"};docs/makeSite""") 
+addCommandAlias("validateJS",  ";macrosJS/compile;platformJS/compile;scalatestJS/test;testkitJS/compile;testsJS/test")
+addCommandAlias("validate",    ";validateJS;validateJVM")
+addCommandAlias("validateAll", s""";++${vers("scalac")};+clean;+validate;++${vers("scalac")};docs/makeSite""") 
 
 /**
- * Build settings
+ * Project settings
  */
-val proj    = "catalysts"
-val home    = "https://github.com/InTheNow/catalysts"
-val repo    = "git@github.com:InTheNow/catalysts.git"
-val api     = "https://InTheNow.github.io/catalysts/api/"
-val license = ("Apache License", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
-val devs    = Seq(Dev("Alistair Johnson", "inthenow"))
+val gh = GitHubSettings(org = "InTheNow", proj = "catalysts", publishOrg = "org.typelevel", license = apache)
+val devs = Seq(Dev("Alistair Johnson", "inthenow"))
 
-// Example to add/overide versions: val vers = versions + ("discipline" -> "0.3")
-val vers = versions
-
-lazy val buildSettings = Seq(
-  organization := "org.typelevel",
-  scalaVersion := vers->"scalac",
-  crossScalaVersions := Seq("2.10.5", scalaVersion.value)
-)
+val vers = versions // to add/overide versions: val vers = versions + ("discipline" -> "0.3")
+val libs = libraries
+val vlibs = (vers, libs)
 
 /**
- * Common settings
+ * catalysts - This is the root project that aggregates the catalystsJVM and catalystsJS sub projects
  */
+lazy val rootSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
+
+lazy val module = mkModuleFactory(gh.proj, mkConfig(rootSettings, commonJvmSettings, commonJsSettings))
+lazy val prj = mkPrjFactory(rootSettings)
+
+lazy val rootPrj = project
+  .configure(mkRootConfig(rootSettings,rootJVM))
+  .aggregate(rootJVM, rootJS)
+  .dependsOn(rootJVM, rootJS, testsJVM % "test-internal -> test")
+
+lazy val rootJVM = project
+  .configure(mkRootJvmConfig(gh.proj, rootSettings, commonJvmSettings))
+  .aggregate(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM, docs)
+  .dependsOn(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM % "compile;test-internal -> test")
+
+lazy val rootJS = project
+  .configure(mkRootJsConfig(gh.proj, rootSettings, commonJsSettings))
+  .aggregate(macrosJS, platformJS, scalatestJS, testkitJS, testsJS)
+  .dependsOn(macrosJS, platformJS, scalatestJS, testsJS % "test-internal -> test")
+
+/**
+ * Macros - cross project that defines macros
+ */
+lazy val macros    = prj(macrosM)
+lazy val macrosJVM = macrosM.jvm
+lazy val macrosJS  = macrosM.js
+lazy val macrosM   = module("macros", CrossType.Pure)
+  .settings(addCompileLibs(vlibs, "macro-compat"):_*)
+  .settings(scalaMacroDependencies(vers("paradise")):_*)
+
+/**
+ * Platform - cross project that provides cross platform support
+ */
+lazy val platform    = prj(platformM)
+lazy val platformJVM = platformM.jvm
+lazy val platformJS  = platformM.js
+lazy val platformM   = module("platform", CrossType.Dummy).dependsOn(macrosM)
+
+/**
+ * Scalatest - cross project that defines test utilities for scalatest
+ */
+lazy val scalatest    = prj(scalatestM)
+lazy val scalatestJVM = scalatestM.jvm
+lazy val scalatestJS  = scalatestM.js
+lazy val scalatestM   = module("scalatest",CrossType.Pure)
+  .dependsOn(testkitM)
+  .settings(disciplineDependencies:_*)
+  .settings(addLibs(vlibs, "scalatest"):_*)
+
+/**
+ * Specs2 - JVM project that defines test utilities for specs2
+ */
+lazy val specs2 = project
+  .dependsOn(testkitJVM, testsJVM % "test-internal -> compile")
+  .settings(moduleName := "catalysts-specs2")
+  .settings(rootSettings:_*)
+  .settings(disciplineDependencies:_*)
+  .settings(addLibs(vlibs, "specs2-core","specs2-scalacheck" ))
+  .settings(commonJvmSettings:_*)
+
+/**
+ * Testkit - cross project that defines test utilities that can be re-used in other libraries, as well as 
+ *         all the tests for this build.
+ */
+lazy val testkit    = prj(testkitM)
+lazy val testkitJVM = testkitM.jvm
+lazy val testkitJS  = testkitM.js
+lazy val testkitM   = module("testkit", CrossType.Pure).dependsOn(macrosM, platformM)
+
+/**
+ * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
+ *         all the tests for this build.
+ */
+lazy val tests    = prj(testsM)
+lazy val testsJVM = testsM.jvm
+lazy val testsJS  = testsM.js
+lazy val testsM   = module("tests", CrossType.Pure)
+  .dependsOn(macrosM, platformM, testkitM, scalatestM % "test-internal -> test")
+  .settings(disciplineDependencies:_*)
+  .settings(noPublishSettings:_*)
+  .settings(addTestLibs(vlibs, "scalatest" ):_*)
+
+/**
+ * Docs - Generates and publishes the scaladoc API documents and the project web site 
+ */
+lazy val docs = project.configure(mkDocConfig(gh, rootSettings, commonJvmSettings,
+    platformJVM, macrosJVM, scalatestJVM, specs2, testkitJVM ))
+
+/**
+ * Settings
+ */
+lazy val buildSettings = sharedBuildSettings(gh, vers)
+
 lazy val commonSettings = sharedCommonSettings ++ Seq(
   scalacOptions ++= commonScalacOptions,
   parallelExecution in Test := false
@@ -41,123 +125,10 @@ lazy val commonJsSettings = Seq(
   scalaJSStage in Global := FastOptStage
 )
 
-lazy val commonJvmSettings = Seq(
- // testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF)
-)
+lazy val commonJvmSettings = Seq()
 
-/**
- * catalysts - This is the root project that aggregates the catalystsJVM and catalystsJS sub projects
- */
-lazy val catalystsSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
+lazy val disciplineDependencies = Seq(addLibs(vlibs, "discipline", "scalacheck" ):_*)
 
-lazy val catalystsConfig = mkConfig(catalystsSettings, commonJvmSettings, commonJsSettings)
-
-lazy val catalysts = project
-  .configure(mkRootConfig(catalystsSettings,catalystsJVM))
-  .aggregate(catalystsJVM, catalystsJS)
-  .dependsOn(catalystsJVM, catalystsJS, testsJVM % "test-internal -> test")
-
-lazy val catalystsJVM = project
-  .configure(mkRootJvmConfig(proj, catalystsSettings, commonJvmSettings))
-  .aggregate(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM, docs)
-  .dependsOn(macrosJVM, platformJVM, scalatestJVM, specs2, testkitJVM, testsJVM % "compile;test-internal -> test")
-
-lazy val catalystsJS = project
-  .configure(mkRootJsConfig(proj, catalystsSettings, commonJsSettings))
-  .aggregate(macrosJS, platformJS, scalatestJS, testkitJS, testsJS)
-  .dependsOn(macrosJS, platformJS, scalatestJS, testsJS % "test-internal -> test")
-
-/**
- * Macros - cross project that defines macros
- */
-lazy val macros = crossProject.crossType(CrossType.Pure)
-  .settings(moduleName := "catalysts-macros")
-  .configure(catalystsConfig)
-  .settings(libraryDependencies += "org.typelevel" %%% "macro-compat" % (vers->"macro-compat")  % "compile")
-  .settings(scalaMacroDependencies(vers->"paradise"):_*)
-
-lazy val macrosJVM = macros.jvm
-lazy val macrosJS = macros.js
-
-/**
- * Platform - cross project that provides cross platform support
- */
-lazy val platform = crossProject.crossType(CrossType.Dummy)
-  .dependsOn(macros)
-  .configure(catalystsConfig)
-  .settings(moduleName := "catalysts-platform")
-
-lazy val platformJVM = platform.jvm
-lazy val platformJS = platform.js
-
-/**
- * Scalatest - cross project that defines test utilities for scalatest
- */
-lazy val scalatest = crossProject.crossType(CrossType.Pure)
-  .dependsOn(testkit)
-  .configure(catalystsConfig)
-  .settings(moduleName := "catalysts-scalatest")
-  .settings(disciplineDependencies:_*)
-  .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % vers.get("scalatest").get )
-
-lazy val scalatestJVM = scalatest.jvm
-lazy val scalatestJS = scalatest.js
-
-/**
- * Specs2 - JVM project that defines test utilities for specs2
- */
-lazy val specs2 = project
-  .dependsOn(testkitJVM, testsJVM % "test-internal -> compile")
-  .settings(moduleName := "catalysts-specs2")
-  .settings(catalystsSettings:_*)
-  .settings(disciplineDependencies:_*)
-  .settings(libraryDependencies += "org.specs2" %% "specs2-core" % (vers->"specs2"))
-  .settings(libraryDependencies += "org.specs2" %% "specs2-scalacheck" % (vers->"specs2"))
-  .settings(commonJvmSettings:_*)
-
-/**
- * Testkit - cross project that defines test utilities that can be re-used in other libraries, as well as 
- *         all the tests for this build.
- */
-lazy val testkit = crossProject.crossType(CrossType.Pure)
-  .dependsOn(macros, platform)
-  .settings(moduleName := "catalysts-testkit")
-  .configure(catalystsConfig)
-
-lazy val testkitJVM = testkit.jvm
-lazy val testkitJS = testkit.js
-
-/**
- * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
- *         all the tests for this build.
- */
-lazy val tests = crossProject.crossType(CrossType.Pure)
-  .dependsOn(macros, platform, testkit, scalatest % "test-internal -> test")
-  .settings(moduleName := "catalysts-tests")
-  .configure(catalystsConfig)
-  .settings(disciplineDependencies:_*)
-  .settings(noPublishSettings:_*)
-  .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % (vers->"scalatest") % "test")
-
-lazy val testsJVM = tests.jvm
-lazy val testsJS = tests.js
-
-/**
- * Docs - Generates and publishes the scaladoc API documents and the project web site 
- */
-lazy val docs = project
-  .configure(mkDocConfig(proj, repo, "com.github.inthenow", catalystsSettings, commonJvmSettings,
-    platformJVM, macrosJVM, scalatestJVM, specs2, testkitJVM ))
-
-/**
- * Plugin and other settings
- */
-lazy val disciplineDependencies = Seq(
-  libraryDependencies += "org.scalacheck" %%% "scalacheck" % (vers->"scalacheck"),
-  libraryDependencies += "org.typelevel" %%% "discipline" % (vers->"discipline")
-)
-
-lazy val publishSettings = sharedPublishSettings(home, repo, api, license, devs) ++ 
-    credentialSettings ++ sharedReleaseProcess
+lazy val publishSettings = sharedPublishSettings(gh, devs) ++ credentialSettings ++ sharedReleaseProcess
 
 lazy val scoverageSettings = sharedScoverageSettings(60)
