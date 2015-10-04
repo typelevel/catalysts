@@ -117,7 +117,7 @@ lazy val docs = project.configure(mkDocConfig(gh, rootSettings, commonJvmSetting
 lazy val buildSettings = sharedBuildSettings(gh, vers)
 
 lazy val commonSettings = sharedCommonSettings ++ Seq(
-  scalacOptions ++= commonScalacOptions,
+  scalacOptions ++= scalacAllOptions,
   parallelExecution in Test := false
 ) ++ warnUnusedImport ++ unidocCommonSettings
 

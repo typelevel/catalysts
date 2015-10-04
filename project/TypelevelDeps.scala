@@ -7,7 +7,7 @@ object Dependencies {
   // Package -> version
   val versions = Map[String, String](
     "discipline"   -> "0.4",
-    "macro-compat" -> "1.0.0",
+    "macro-compat" -> "1.0.2",
     "paradise"     -> "2.1.0-M5",
     "scalacheck"   -> "1.12.4",
     "scalatest"    -> "3.0.0-M7",

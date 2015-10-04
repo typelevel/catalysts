@@ -32,7 +32,7 @@ object Base {
   val apache = ("Apache License", url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
   val mit = ("MIT", url("http://opensource.org/licenses/MIT"))
 
-  // Github settings and devs
+  // Github settings and related settings usually found in a Github README
   case class GitHubSettings(org: String, proj: String, publishOrg: String, license: (String, URL)) {
 
     def home = s"https://github.com/$org/$proj"
@@ -107,15 +107,21 @@ object Base {
     }
   )
 
-  lazy val commonScalacOptions = Seq(
+  lazy val scalacCommonOptions = Seq(
     "-deprecation",
     "-encoding", "UTF-8",
     "-feature",
+    "-unchecked"
+  )
+
+  lazy val scalacLanguageOptions = Seq(
     "-language:existentials",
     "-language:higherKinds",
     "-language:implicitConversions",
-    "-language:experimental.macros",
-    "-unchecked",
+    "-language:experimental.macros"
+  )
+
+  lazy val scalacStrictOptions = Seq(
     "-Xfatal-warnings",
     "-Xlint",
     "-Yinline-warnings",
@@ -125,6 +131,9 @@ object Base {
     "-Ywarn-value-discard",
     "-Xfuture"
   )
+
+  lazy val scalacAllOptions = scalacCommonOptions ++ scalacLanguageOptions ++ scalacStrictOptions
+
 
   lazy val sharedCommonSettings = Seq(
     updateOptions := updateOptions.value.withCachedResolution(true)
@@ -193,7 +202,7 @@ object Base {
           Seq("-Ywarn-unused-import")
       }
     },
-    scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
+    scalacOptions in (Compile, console) -= "-Ywarn-unused-import",
     scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console))
   )
 
@@ -230,7 +239,7 @@ object Base {
    * 
    *   lazy val core    = prj(coreM)
    *   lazy val coreJVM = coreM.jvm
-   *   lazy val coreJS  = scalatestM.js
+   *   lazy val coreJS  = coreM.js
    *   lazy val coreM   = module("core",CrossType.Pure)
    *     .dependsOn(testkitM)
    *     .settings(addTestLibs(vlibs, "scalatest"):_*)
