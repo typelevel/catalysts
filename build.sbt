@@ -1,5 +1,5 @@
-import sbtcatalysts.Base._
 import org.typelevel.Dependencies._
+
 /**
  * These aliases serialise the build for the benefit of Travis-CI, also useful for pre-PR testing.
  * If new projects are added to the build, these must be updated.
@@ -9,6 +9,7 @@ addCommandAlias("validateJVM", ";scalastyle;buildJVM")
 addCommandAlias("validateJS",  ";macrosJS/compile;platformJS/compile;scalatestJS/test;testkitJS/compile;testsJS/test")
 addCommandAlias("validate",    ";validateJS;validateJVM")
 addCommandAlias("validateAll", s""";++${vers("scalac")};+clean;+validate;++${vers("scalac")};docs/makeSite""") 
+addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVersion.value.get + \"-SNAPSHOT\"")
 
 /**
  * Project settings
