@@ -6,11 +6,11 @@ import catalysts.macros._
 
 class MacroTests extends TestSuite {
 
-  test("Test className") {
+  it("Test className") {
     assert(className(this) == "catalysts.scalatest.MacroTests")
   }
 
-  test("Test TypeTagM") {
+  it("Test TypeTagM") {
     def f1[A](implicit tag: TypeTagM[A]): String = tag
     def f2[A](implicit tag: TypeTagM[A]): String = tag.name
     def f3[A](implicit tag: TypeTagM[A]): String = tag.toString

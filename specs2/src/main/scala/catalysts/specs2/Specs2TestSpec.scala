@@ -2,40 +2,51 @@ package catalysts
 package specs2
 
 import testkit.TestSpec
+import scala.reflect.ClassTag
 
 import org.specs2.specification.core.{Execution, Fragments}
-//import org.specs2.execute.AsResult//
 import org.specs2.mutable.SpecificationLike
-import org.specs2.execute.AnyValueAsResult//
+import org.specs2.execute.AnyValueAsResult
 import org.specs2.execute.ResultImplicits
+import org.specs2.matcher.MatchersImplicits
 
 trait Specs2SpecTest extends TestSpec[Specs2Kit] with SpecificationLike {
  import org.specs2.specification.create.FragmentFactory
 
  val frf = fragmentFactory
 
-  def assertEq[A](actual: => A, expected: => A): Specs2Kit#AssertResult = { 
+  def assert_==[A](actual: => A, expected: => A): Specs2Kit#AssertResult = { 
     actual must_== expected
   } 
 
-
-  def assertEq[A](msg: String, actual: => A, expected: => A): Specs2Kit#AssertResult = { 
+  def assert_==[A](msg: String, actual: => A, expected: => A): Specs2Kit#AssertResult = { 
     actual aka msg must_== expected
   } 
 
- // def fail(s: String): Nothing 
-/*
- def test(s: String)(a: => Any): Unit =  {
-    val r= Fragments( frf.example(s, new AnyValueAsResult().asResult(a)), frf.break).fragments // s >> {a}//s in {val r = a}
+  def assert_===[A](actual: => A, expected: => A)
+     (implicit show: Specs2Kit#TestShow[A], equal: Specs2Kit#TestEqual[A]): Specs2Kit#AssertResult = 
+    actual must_=== expected
+
+  def assertThrow[A, T <: Throwable](actual: => A)(implicit m: ClassTag[T]): Specs2Kit#ExceptionResult = { 
+    val erasedClass = m.runtimeClass
+     val failed  =
+       try {
+         actual
+         "no exception thrown, expected " + erasedClass
+       } catch {
+         case ex: Throwable =>
+           if (!erasedClass.isInstance(ex))
+             "wrong exception thrown, expected: " + erasedClass + " got: " + ex
+           else ""
+       }
+     //if (failed) fail("no exception thrown, expected " + erasedClass)
+     assert_==(failed, failed.isEmpty, true)
   }
- */
-//import org.specs2.matcher.ShouldMatchers
-import org.specs2.specification.dsl.mutable.MutableDsl
+
  def block(s: String)(a: => Any): Specs2Kit#TestBlock =  {
-   //val r = s should { s in new AnyValueAsResult().asResult(a)}  
    s in new AnyValueAsResult().asResult(a)
  }
 
-def nest(s: String)(a: => Any): Specs2Kit#TestNest = {s should  a.asInstanceOf[Specs2Kit#TestBlock]}
+ def nest(s: String)(a: => Any): Specs2Kit#TestNest = {s should  a.asInstanceOf[Specs2Kit#TestBlock]}
 
 }

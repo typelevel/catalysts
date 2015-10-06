@@ -10,19 +10,19 @@ trait FSuite[Tk <: TestKit] {self : TestSpec[Tk] =>
 trait FSuiteMatchers [Tk <: TestKit] {self : TestSpec[Tk] =>
   import java.util.Arrays
 
-  def assertEquals[A](actual: => A, expected: => A) = assertEq(actual, expected)
+  def assertEquals[A](actual: => A, expected: => A) = assert_==(actual, expected)
 
-  def assetTrue(x: => Boolean) = assertEq(x, true)
+  def assetTrue(x: => Boolean) = assert_==(x, true)
 
-  def assertEquals[A](msg:String, actual: => A, expected: => A) = assertEq(msg, actual, expected)
+  def assertEquals[A](msg:String, actual: => A, expected: => A) = assert_==(msg, actual, expected)
+     
+  def assertFalse(actual: => Boolean) = assert_==[Boolean](actual, false)
 
-  def assertFalse(actual: => Boolean) = assertEq[Boolean](actual, false)
+  def assertTrue(actual: => Boolean) = assert_==[Boolean](actual, true)
 
-  def assertTrue(actual: => Boolean) = assertEq[Boolean](actual, true)
+  def assertTrue() = assert_==[Boolean](true, true)
 
-  def assertTrue() = assertEq[Boolean](true, true)
-
-  def assertFalse() = assertEq[Boolean](true, false)
+  def assertFalse() = assert_==[Boolean](true, false)
 
   def assertEquals(v1: Double, v2: Double, delta:Double) =
     assertTrue(Math.abs(v1 - v2) < delta)
@@ -30,7 +30,7 @@ trait FSuiteMatchers [Tk <: TestKit] {self : TestSpec[Tk] =>
   def assertArrayEquals(v1: Array[Object], v2: Array[Object]) =
     assertTrue(Arrays.equals(v1, v2))
 
-  def assertTypedEquals[A](actual: A, expected: A) = assertEq(actual, expected)
+  def assertTypedEquals[A](actual: A, expected: A) = assert_==(actual, expected)
 
   def assertTypedSame[A <: AnyRef](actual: A, expected: A) = assertTrue(actual eq expected)
 }

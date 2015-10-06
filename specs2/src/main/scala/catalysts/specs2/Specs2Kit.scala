@@ -9,8 +9,11 @@ import org.specs2.specification.core.{Fragment, Fragments}
 trait Specs2Kit extends TestKit {
   
   type AssertResult = Result
+  type ExceptionResult =  Result
+  type TestEqual[A] = Unit
   type TestNest = Fragment
   type TestBlock = Fragment
+  type TestShow[A] = Unit
 
   type Params = Parameters
   type Structure = Fragments

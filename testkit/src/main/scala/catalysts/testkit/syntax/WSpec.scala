@@ -6,8 +6,6 @@ import scala.reflect.ClassTag
 
 trait WSpec[Tk <: TestKit] {self : TestSpec[Tk] => 
 
-//  def assertEquals[A](actual: => A, expected: => A) = assertEq(actual, expected)
-
   implicit class StringOps(s: String) {
 
     def should[A](a: => Any): Tk#TestNest = nest(s)(a)
@@ -20,7 +18,7 @@ trait WSpecMatchers [Tk <: TestKit] { self : TestSpec[Tk] =>
 
   implicit class AnyOps[A](actual: => A) {
 
-    def must_==(expected: A) = assertEq(actual, expected)
-    def mustThrowA[T <: Throwable](implicit m: ClassTag[T]) = throwA
+    def must_==(expected: A) = assert_==(actual, expected)
+    def mustThrowA[T <: Throwable](implicit m: ClassTag[T]) = assertThrow[A, T](actual)(m)
   }
 }
