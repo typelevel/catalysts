@@ -1,0 +1,14 @@
+package catalysts
+package testkit
+
+
+object LawOps {
+
+  def apply[Tk <: TestKit](implicit lawOps: LawOps[Tk]): LawOps[Tk] = lawOps
+}
+
+
+trait LawOps[Tk <: TestKit] {
+
+ // def checkAllLaws(name: String, ruleSet: Tk#RuleSet): Tk#Structure
+}

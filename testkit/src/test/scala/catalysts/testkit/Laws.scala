@@ -1,5 +1,5 @@
 package catalysts
-package tests
+package testkit
 
 import org.scalacheck.{Arbitrary, Prop}
 import org.typelevel.discipline.Laws

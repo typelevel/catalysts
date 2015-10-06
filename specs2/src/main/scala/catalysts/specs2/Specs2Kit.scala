@@ -2,13 +2,16 @@ package catalysts
 package specs2
 
 import catalysts.testkit._
+import org.specs2.execute.Result
 import org.specs2.scalacheck.Parameters
-import org.typelevel.discipline.{Laws => DisciplineLaws}
+import org.specs2.specification.core.{Fragment, Fragments}
 
 trait Specs2Kit extends TestKit {
+  
+  type AssertResult = Result
+  type TestNest = Fragment
+  type TestBlock = Fragment
 
   type Params = Parameters
-  type Laws = DisciplineLaws
-  type RuleSet = DisciplineLaws#RuleSet
-  type Structure = org.specs2.specification.core.SpecStructure
+  type Structure = Fragments
 }

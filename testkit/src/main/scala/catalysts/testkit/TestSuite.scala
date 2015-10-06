@@ -9,5 +9,5 @@ trait TestSuite
   with    StdTest { self: TestSettings =>
 
   notifyTestLoading()
-  val mod = testType * getTestMode 
+  val mod = testType * getTestMode  
 }

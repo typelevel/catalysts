@@ -1,0 +1,17 @@
+package catalysts
+package testkit
+
+trait TestKitModule {
+
+  type Tk <: TestKit
+}
+
+trait TestKitOpsModule extends TestKitModule {
+
+  implicit val ops: TestKitOps[Tk]
+}
+
+trait LawsOpsModule extends TestKitModule {
+
+  implicit val lawsOps: LawsOps[Tk]
+}

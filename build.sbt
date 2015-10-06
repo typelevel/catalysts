@@ -69,7 +69,7 @@ lazy val scalatest    = prj(scalatestM)
 lazy val scalatestJVM = scalatestM.jvm
 lazy val scalatestJS  = scalatestM.js
 lazy val scalatestM   = module("scalatest",CrossType.Pure)
-  .dependsOn(testkitM)
+  .dependsOn(testkitM % "compile; test -> test")
   .settings(disciplineDependencies:_*)
   .settings(addLibs(vlibs, "scalatest"):_*)
 
@@ -77,7 +77,7 @@ lazy val scalatestM   = module("scalatest",CrossType.Pure)
  * Specs2 - JVM project that defines test utilities for specs2
  */
 lazy val specs2 = project
-  .dependsOn(testkitJVM, testsJVM % "test-internal -> compile")
+  .dependsOn(testkitJVM % "compile; test -> test")
   .settings(moduleName := "catalysts-specs2")
   .settings(rootSettings:_*)
   .settings(disciplineDependencies:_*)
@@ -92,8 +92,23 @@ lazy val testkit    = prj(testkitM)
 lazy val testkitJVM = testkitM.jvm
 lazy val testkitJS  = testkitM.js
 lazy val testkitM   = module("testkit", CrossType.Pure).dependsOn(macrosM, platformM)
+  .settings(disciplineDependencies:_*)
 
 /**
+ * Speclite - cross project that implements a basic test framework, with minimal external dependencies.
+ */
+lazy val speclite    = prj(specliteM)
+lazy val specliteJVM = specliteM.jvm
+lazy val specliteJS  = specliteM.js
+lazy val specliteM   =  module("speclite", CrossType.Pure)
+  .dependsOn(platformM)
+  .settings(addCompileLibs(vlibs, "macro-compat"):_*)
+  .settings(scalaMacroDependencies(vers("paradise")):_*)
+  .jvmSettings(libraryDependencies += "org.scala-sbt" %  "test-interface" % "1.0")
+  .jvmSettings(libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion) // % "provided", 
+  .jsSettings( libraryDependencies += "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion)
+
+/*
  * Tests - cross project that defines test utilities that can be re-used in other libraries, as well as 
  *         all the tests for this build.
  */

@@ -1,22 +1,11 @@
 package catalysts
 package specs2
 
-import org.typelevel.discipline.{Laws, Predicate}
-import catalysts.macros._
-import catalysts.testkit.{StdTest, TestModifier, TestNotifications, TestSettings, WellTested}
-import org.scalacheck.Gen.Parameters
-import org.scalacheck.{Arbitrary, Prop}
-import catalysts.tests._
+import catalysts.testkit._
 
-class LawTests extends TestSuite {
-  implicit def groupLaws[A: Arbitrary] = GroupLaws[A]
+//import testkit.TestSpec
+class Specs2LawTests extends TestSuite with LawTests[Specs2Kit] with Specs2SpecTest
 
-  def is = laws[GroupLaws, Int].check(_.group)
-}
-
-class ListLawTests extends TestSuite {
-  override def shouldNotify = false
-  implicit def groupLaws[A: Arbitrary] = GroupLaws[A]
-
-  def is = laws[GroupLaws, List[Int]].check(_.additiveGroup)
-}
+class Specs2FSpecTests extends TestSuite with FSpecTests[Specs2Kit] with Specs2SpecTest
+class Specs2FSuiteTests extends TestSuite with FSuiteTests[Specs2Kit] with Specs2SpecTest
+class Specs2WSpecTests extends TestSuite with WSpecTests[Specs2Kit] with Specs2SpecTest

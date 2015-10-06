@@ -2,10 +2,12 @@ package catalysts
 package testkit
 
 trait TestKit {
+  // Types related to test type
+  type AssertResult
+  type TestNest
+  type TestBlock  
 
   // Types related to Laws
-  type Laws
   type Params
-  type RuleSet
   type Structure
 }

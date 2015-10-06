@@ -1,0 +1,14 @@
+package catalysts
+package testkit
+
+
+object TestKitOps {
+
+  def apply[Tk <: TestKit](implicit ops: TestKitOps[Tk]): TestKitOps[Tk] = ops
+
+}
+
+
+trait TestKitOps[Tk <: TestKit] {
+
+}

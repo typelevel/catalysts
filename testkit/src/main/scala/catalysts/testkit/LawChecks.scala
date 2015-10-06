@@ -2,6 +2,7 @@ package catalysts
 package testkit
 
 import catalysts.macros._
+import org.typelevel.discipline.Laws
 
 /**
  * Trait that facilitates law checks
@@ -11,13 +12,13 @@ import catalysts.macros._
  * @see [[https://github.com/non/algebra/issues/57 Original issue in Algebra]], 
  *      [[https://github.com/non/algebra/pull/65 Original implementation in Algebra]]
  */
-trait LawChecks[Tk <: TestKit] {
+trait LawChecks[Tk <: TestKit] { self: TestSuite =>
 
   /**
    * Check the `laws` using `name` as the base name for the tests. 
    */
-  case class LawChecker[L <: Tk#Laws](name: String, laws: L) {
-    def check(f: L => Tk#RuleSet): Tk#Structure = checkAllLaws(name, f(laws))
+  case class LawChecker[L <: Laws](name: String, laws: L) {
+    def check(f: L => Laws#RuleSet): Tk#Structure = checkAllLaws(name, f(laws))
   }
 
   /**
@@ -37,10 +38,10 @@ trait LawChecks[Tk <: TestKit] {
    * @param tag  the tag associated with type to test
    * @return     the `LawChecker` to check the law
    */
-  def laws[L[_] <: Tk#Laws, A](implicit laws: L[A], tag: TypeTagM[A]): LawChecker[L[A]] =
+  def laws[L[_] <: Laws, A](implicit laws: L[A], tag: TypeTagM[A]): LawChecker[L[A]] =
     LawChecker("[" + tag.name + "]", laws)
 
-  def checkAllLaws(name: String, ruleSet: Tk#RuleSet): Tk#Structure
+  def checkAllLaws(name: String, ruleSet: Laws#RuleSet): Tk#Structure
 }
 
 object LawChecks {
