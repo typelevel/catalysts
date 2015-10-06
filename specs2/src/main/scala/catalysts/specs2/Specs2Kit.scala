@@ -7,7 +7,7 @@ import org.specs2.scalacheck.Parameters
 import org.specs2.specification.core.{Fragment, Fragments}
 
 trait Specs2Kit extends TestKit {
-  
+
   type AssertResult = Result
   type ExceptionResult =  Result
   type TestEqual[A] = Unit
