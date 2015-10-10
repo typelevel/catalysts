@@ -1,23 +1,24 @@
 package catalysts
 package scalatest
 
-import testkit.TestSpec
+import testkit.{Equal, Show, TestSpec}
 import scala.reflect.ClassTag
 import org.scalatest.{FunSpecLike, Matchers, Tag}
 
 trait ScalatestTestSpec extends   FunSpecLike with TestSpec[ScalatestKit]  with Matchers { 
-object tagTest extends Tag("ScalaTests")
+
+  object tagTest extends Tag("ScalaTests")
  
- def assert_==[A](actual: => A, expected: => A): ScalatestKit#AssertResult = { 
-    assert( actual == expected)
+  def assert_==[A](actual: => A, expected: => A): ScalatestKit#AssertResult = { 
+    assert(actual == expected)
   } 
 
-  def assert_==[A](msg: String, actual: => A, expected: => A): ScalatestKit#AssertResult = { 
-    assert( actual == expected, msg)
+  def assert_==[A](msg: String, actual: => A, expected: => A): ScalatestKit#AssertResult = {
+    assert(actual == expected, msg)
   } 
 
   def assert_===[A](actual: => A, expected: => A)
-     (implicit show: ScalatestKit#TestShow[A], equal: ScalatestKit#TestEqual[A]): ScalatestKit#AssertResult = 
+     (implicit show: Show[A], equal: Equal[A]): ScalatestKit#AssertResult =
      actual should === (expected)
   
   def nest(s: String)(a: => Any): Unit = it(s){val r = a}
@@ -35,7 +36,6 @@ object tagTest extends Tag("ScalaTests")
              "wrong exception thrown, expected: " + erasedClass + " got: " + ex
            else ""
        }
-     //if (failed) fail("no exception thrown, expected " + erasedClass)
      assert_==(failed, failed.isEmpty, true)
   }
 }

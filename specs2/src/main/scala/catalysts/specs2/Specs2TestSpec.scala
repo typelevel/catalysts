@@ -1,7 +1,7 @@
 package catalysts
 package specs2
 
-import testkit.TestSpec
+import testkit.{Equal, Show, TestSpec}
 import scala.reflect.ClassTag
 
 import org.specs2.specification.core.{Execution, Fragments}
@@ -24,7 +24,7 @@ trait Specs2SpecTest extends TestSpec[Specs2Kit] with SpecificationLike {
   }
 
   def assert_===[A](actual: => A, expected: => A)
-     (implicit show: Specs2Kit#TestShow[A], equal: Specs2Kit#TestEqual[A]): Specs2Kit#AssertResult =
+     (implicit show: Show[A], equal: Equal[A]): Specs2Kit#AssertResult =
     actual must_=== expected
 
   def assertThrow[A, T<:Throwable](actual: => A)(implicit m: ClassTag[T]): Specs2Kit#ExceptionResult = {

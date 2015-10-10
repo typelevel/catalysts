@@ -8,7 +8,6 @@ trait FSuite[Tk <: TestKit] {self : TestSpec[Tk] =>
 }
 
 trait FSuiteMatchers [Tk <: TestKit] {self : TestSpec[Tk] =>
-  import java.util.Arrays
 
   def assertEquals[A](actual: => A, expected: => A) = assert_==(actual, expected)
 
@@ -26,9 +25,6 @@ trait FSuiteMatchers [Tk <: TestKit] {self : TestSpec[Tk] =>
 
   def assertEquals(v1: Double, v2: Double, delta:Double) =
     assertTrue(Math.abs(v1 - v2) < delta)
-
-  def assertArrayEquals(v1: Array[Object], v2: Array[Object]) =
-    assertTrue(Arrays.equals(v1, v2))
 
   def assertTypedEquals[A](actual: A, expected: A) = assert_==(actual, expected)
 

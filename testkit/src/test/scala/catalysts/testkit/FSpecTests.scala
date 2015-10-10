@@ -2,13 +2,13 @@ package catalysts
 package testkit
 
 
-import syntax.{FSuite, FSuiteMatchers}
+import syntax.{FSpec, FSpecMatchers}
 
-trait  FSpecTests[Tk <: TestKit]  extends TestSpec[Tk] with FSuite[Tk] with FSuiteMatchers[Tk] {
+trait  FSpecTests[Tk <: TestKit]  extends TestSpec[Tk] with FSpec[Tk] with FSpecMatchers[Tk] {
   self: TestSuite =>
  
-  suite("One") {
-    test("equal One") {
+  describe("One") {
+    it("equal One") {
       assertEquals(1, 1)
     }
   }
