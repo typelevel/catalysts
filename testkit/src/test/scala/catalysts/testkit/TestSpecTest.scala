@@ -13,6 +13,11 @@ trait TestSpecTests[Tk <: TestKit] extends TestSpec[Tk] { self: TestSuite =>
   implicit val showInt: Show[Int] = Show.fromToString[Int]
   implicit val equalInt: Equal[Int] = Equal.instance[Int]( _ == _  )
 
+  assert_==("123", showInt.show(123))
+  assert_==("123", Show.show[Int](_.toString).show(123))
+
+  assert_==(true, equalInt.eqv(123, 123))
+
   assert_==(1, 1)
   assert_==("One == 1", 1, 1)
   assert_===(1, 1)

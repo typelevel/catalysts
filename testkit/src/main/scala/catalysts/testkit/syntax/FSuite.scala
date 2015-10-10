@@ -11,8 +11,6 @@ trait FSuiteMatchers [Tk <: TestKit] {self : TestSpec[Tk] =>
 
   def assertEquals[A](actual: => A, expected: => A) = assert_==(actual, expected)
 
-  def assetTrue(x: => Boolean) = assert_==(x, true)
-
   def assertEquals[A](msg:String, actual: => A, expected: => A) = assert_==(msg, actual, expected)
      
   def assertFalse(actual: => Boolean) = assert_==[Boolean](actual, false)
