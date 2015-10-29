@@ -39,4 +39,22 @@ trait TestSpecTests { self: TestSpec =>
       }
     assert_==(assertThrowTest2, true)
   }
+
+  val assertEqEqMsg1 =
+    try {
+      assert_==("One == 2", 1, 2)
+      false
+    } catch {
+      case ex: Throwable => true
+    }
+  assert_==(assertEqEqMsg1, true)
+
+  val assertEqEqEq1 =
+    try {
+      assert_===(1, 2)
+      false
+    } catch {
+      case ex: Throwable => true
+    }
+  assert_==(assertEqEqEq1, true)
 }

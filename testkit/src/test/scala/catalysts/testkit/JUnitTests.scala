@@ -1,7 +1,7 @@
 package catalysts
 package testkit
 
-import catalysts.testkit.syntax.junit.Test
+import catalysts.testkit.syntax.junit.{Assert,Test}
 import catalysts.testkit.syntax.{FSuiteMatchers, FSuite}
 
 trait JSpec extends FSuiteMatchers with FSuite with TestSpec with TestKit
@@ -33,5 +33,6 @@ trait JUnitTests extends JSpec {
   def typeEq() = {
     assertTypedEquals(1, 1)
     assertTypedSame(List(), List())
+    assertEquals(0, Assert.assertArrayEquals)
   }
 }

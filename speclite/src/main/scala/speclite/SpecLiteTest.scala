@@ -123,13 +123,11 @@ object SpecLiteTest {
       val customClassLoader: Option[ClassLoader] = None
     }
 
-    /** Default test parameters instance. */
+    /**
+     * Default test parameters instance.
+     */
     val default: Parameters = new Default {}
 
-    /** Verbose console reporter test parameters instance.
-    val defaultVerbose: Parameters = new Default {
-      override val testCallback = ConsoleReporter(2)
-    }*/
   }
 
   /** Test statistics */

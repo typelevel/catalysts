@@ -37,12 +37,12 @@ lazy val rootPrj = project
 
 lazy val rootJVM = project
   .configure(mkRootJvmConfig(gh.proj, rootSettings, commonJvmSettings))
-  .aggregate(macrosJVM, platformJVM, scalatestJVM, specs2, specliteJVM, testkitJVM, testsJVM, docs)
-  .dependsOn(macrosJVM, platformJVM, scalatestJVM, specs2, specliteJVM, testkitJVM, testsJVM % "compile;test-internal -> test")
+  .aggregate(checkliteJVM, macrosJVM, platformJVM, scalatestJVM, specs2, specliteJVM, testkitJVM, testsJVM, docs)
+  .dependsOn(checkliteJVM, macrosJVM, platformJVM, scalatestJVM, specs2, specliteJVM, testkitJVM, testsJVM % "compile;test-internal -> test")
 
 lazy val rootJS = project
   .configure(mkRootJsConfig(gh.proj, rootSettings, commonJsSettings))
-  .aggregate(macrosJS, platformJS, scalatestJS, specliteJS, testkitJS, testsJS)
+  .aggregate(checkliteJS, macrosJS, platformJS, scalatestJS, specliteJS, testkitJS, testsJS)
 
 /**
  * CheckLite - cross project that implements a basic test framework, based on ScalaCheck.
@@ -51,7 +51,7 @@ lazy val checklite    = prj(checkliteM)
 lazy val checkliteJVM = checkliteM.jvm
 lazy val checkliteJS  = checkliteM.js
 lazy val checkliteM   = module("checklite", CrossType.Pure)
-  .dependsOn(testkitM % "compile; test -> test")
+  .dependsOn(testkitM % "compile; test -> test", lawkitM % "compile; test -> test")
   .settings(disciplineDependencies:_*)
   .settings(addLibs(vAll, "scalacheck"):_*)
   .jvmSettings(libraryDependencies += "org.scala-sbt" %  "test-interface" % "1.0")

@@ -23,8 +23,10 @@ class Properties(val name: String) extends Prop {
   lazy val property = new PropertySpecifier()
 }
 
-/** Helper class to satisfy ScalaJS compilation. Do not use this directly,
-  *  use [[Prop.apply]] instead. */
+/**
+ * Helper class to satisfy ScalaJS compilation. Do not use this directly,
+ *  use Prop.apply instead.
+ */
 class PropFromFun(f: Gen.Parameters => Prop.Result) extends Prop {
   def apply(prms: Gen.Parameters) = f(prms)
 }
