@@ -20,3 +20,4 @@ class ClassInfoMacros(val c: whitebox.Context) {
   def classNameImpl(that: c.Expr[Any]): c.Expr[String] =
     c.Expr[String](q"$that.getClass.getName")
 }
+

@@ -2,29 +2,77 @@ package catalysts
 package testkit
 package syntax
 
-trait FSuite[Tk <: TestKit] {self : TestSpec[Tk] => 
+
+trait FSuite { self : TestSpec =>
+
   def test(s: String)(a: => Any) = block(s)(a)
+
   def suite(s: String)(a: => Any) = nest(s)(a)
 }
 
-trait FSuiteMatchers [Tk <: TestKit] {self : TestSpec[Tk] =>
+trait FSuiteMatchers { self : TestKit =>
 
-  def assertEquals[A](actual: => A, expected: => A) = assert_==(actual, expected)
+  def assertEquals[A](actual: => A, expected: => A): AssertResult =
+    macro FSuiteMatchersMacros.assertEq[A]
 
-  def assertEquals[A](msg:String, actual: => A, expected: => A) = assert_==(msg, actual, expected)
-     
-  def assertFalse(actual: => Boolean) = assert_==[Boolean](actual, false)
+  def assertEquals[A](msg:String, actual: => A, expected: => A): AssertResult =
+    macro FSuiteMatchersMacros.assertMsgEq[A]
 
-  def assertTrue(actual: => Boolean) = assert_==[Boolean](actual, true)
+  def assertFalse(actual: => Boolean): AssertResult =
+    macro FSuiteMatchersMacros.assertAcFalse
 
-  def assertTrue() = assert_==[Boolean](true, true)
+  def assertTrue(actual: => Boolean): AssertResult =
+    macro FSuiteMatchersMacros.assertAcTrue
 
-  def assertFalse() = assert_==[Boolean](true, false)
+  def assertTrue(): AssertResult =
+    macro FSuiteMatchersMacros.assertTrue
 
-  def assertEquals(v1: Double, v2: Double, delta:Double) =
-    assertTrue(Math.abs(v1 - v2) < delta)
+  def assertFalse(): AssertResult =
+    macro FSuiteMatchersMacros.assertFalse
 
-  def assertTypedEquals[A](actual: A, expected: A) = assert_==(actual, expected)
+  def assertEquals(v1: Double, v2: Double, delta:Double): AssertResult =
+    macro FSuiteMatchersMacros.assertEquals
 
-  def assertTypedSame[A <: AnyRef](actual: A, expected: A) = assertTrue(actual eq expected)
+  def assertTypedEquals[A](actual: A, expected: A): AssertResult =
+    macro FSuiteMatchersMacros.assertTypedEquals[A]
+
+  def assertTypedSame[A <: AnyRef](actual: A, expected: A): AssertResult =
+    macro FSuiteMatchersMacros.assertTypedSame[A]
+
+}
+
+import scala.language.experimental.macros
+import scala.reflect.macros.whitebox
+import macrocompat.bundle
+
+@bundle
+class FSuiteMatchersMacros(val c: whitebox.Context)  {
+  import c.universe._
+
+  def assertEq[A](actual: Tree, expected: Tree): Tree =
+    q"assertEqEqImpl($actual , $expected)"
+
+  def assertMsgEq[A](msg: Tree, actual: Tree, expected: Tree): Tree =
+    q"assertMsgEqEqImpl($msg, $actual , $expected)"
+
+  def assertAcFalse(actual: Tree): Tree =
+    q"assertEqEqImpl($actual , false)"
+
+  def assertAcTrue(actual: Tree): Tree =
+    q"assertEqEqImpl($actual , true)"
+
+  def assertTrue(): Tree =
+    q"assertEqEqImpl(true , true)"
+
+  def assertFalse(): Tree =
+    q"assertEqEqImpl(true , false)"
+
+  def assertEquals(v1: Tree, v2: Tree, delta: Tree): Tree =
+    q"assertEqEqImpl(Math.abs($v1 - $v2) < $delta, true)"
+
+  def assertTypedEquals[A](actual: Tree, expected: Tree): Tree =
+    q"assertEqEqImpl($actual , $expected)"
+
+  def assertTypedSame[A <: AnyRef](actual: Tree, expected: Tree): Tree =
+    q"assertEqEqImpl($actual eq $expected, true)"
 }

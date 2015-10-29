@@ -1,16 +1,14 @@
 package catalysts
 package testkit
 
+import syntax.{FSuiteMatchers, FSuite}
 
-import syntax.{FSuite, FSuiteMatchers}
-import java.util.Arrays
-
-trait  FSuiteTests[Tk <: TestKit]  extends TestSpec[Tk] with FSuite[Tk] with FSuiteMatchers[Tk] {
-  self: TestSuite =>
+trait  FSuiteTests extends FSuiteMatchers with FSuite { self: TestSpec with TestKit =>
 
   suite("One") {
     test("equal One") {
       assertEquals(1, 1)
+
       assertEquals("1 == 1", 1, 1)
       assertTrue(true)
       assertFalse(false)

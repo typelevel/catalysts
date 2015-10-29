@@ -2,28 +2,58 @@ package catalysts
 package testkit
 
 import scala.reflect.ClassTag
+import scala.language.experimental.macros
+import scala.reflect.macros.whitebox
+import macrocompat.bundle
 
-/**
- * 
- */
-trait TestSpec[Tk <: TestKit] {self => 
+trait TestSpec { self: TestKit =>
 
-  implicit val tk: TestSpec[Tk] = self
-  
-  def assert_==[A](actual: => A, expected: => A): Tk#AssertResult
+  def assertEqEqImpl[A](actual: => A, expected: => A): AssertResult
 
-  def assert_==[A](msg: String, actual: => A, expected: => A): Tk#AssertResult
- 
-  def assert_===[A](actual: => A, expected: => A)
-     (implicit show: Show[A], equal: Equal[A]): Tk#AssertResult
+  def assertMsgEqEqImpl[A](msg: String, actual: => A, expected: => A): AssertResult
 
-  def assertThrow[A, T <: Throwable](actual: => A)(implicit m: ClassTag[T]): Tk#ExceptionResult
+  def assertEqEqEqImpl[A](actual: => A, expected: => A)
+                         (implicit show: Show[A], equal: Equal[A]): AssertResult
 
-  def block(s: String)(a: => Any): Tk#TestBlock
+  def assert_ThrowImpl[A, T <: Throwable](actual: => A)(implicit m: ClassTag[T]): ExceptionResult
 
-  //def fail(s: String): Nothing 
+  def block(s: String)(a: => Any): TestBlock
 
-  def nest(s: String)(a: => Any): Tk#TestNest
+  def nest(s: String)(a: => Any): TestNest
+
+  def assert_==[A](actual: => A, expected: => A): AssertResult =
+    macro TestSpecMacros.assertEqEq[A]
+
+  def assert_==[A](msg: String, actual: => A, expected: => A): AssertResult =
+    macro TestSpecMacros.assertMsgEqEq[A]
+
+  def assert_===[A](actual: => A, expected: => A): AssertResult =
+    macro TestSpecMacros.assertEqEqEq[A]
+
+  def assert_Throw[A, T <: Throwable](actual: => A): ExceptionResult =
+    macro TestSpecMacros.assert_Throw[A, T]
+}
+
+@bundle
+class TestSpecMacros(val c: whitebox.Context)  {
+  import c.universe._
+
+  def assertEqEq[A](actual: Tree, expected: Tree): Tree =
+    q"assertEqEqImpl($actual , $expected)"
+
+  def assertMsgEqEq[A](msg: Tree, actual: Tree, expected: Tree): Tree =
+    q"assertMsgEqEqImpl($msg, $actual , $expected)"
+
+  def assertEqEqEq[A](actual: Tree, expected: Tree): Tree =
+    q"assertEqEqEqImpl($actual , $expected)"
+
+  def assert_Throw[A, T <: Throwable](actual: Tree)
+                                     (implicit aTag: WeakTypeTag[A], tTag: WeakTypeTag[T]) : Tree = {
+
+    val aTpe = weakTypeOf[A]
+    val tTpe = weakTypeOf[T]
+    q"assert_ThrowImpl[$aTpe, $tTpe]($actual)"
+  }
 }
 
 

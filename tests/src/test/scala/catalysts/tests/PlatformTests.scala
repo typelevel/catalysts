@@ -1,8 +1,6 @@
 package catalysts
 package tests
 
-import catalysts.scalatest.TestSuite
-
 class PlatformTests extends TestSuite {
 
   def hackyIsJS(): Boolean = 1.0.toString == "1"

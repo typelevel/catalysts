@@ -47,7 +47,7 @@ private abstract class SpecLiteRunner(
     val props: Map[String,Prop] = {
       val fp = taskDef.fingerprint.asInstanceOf[SubclassFingerprint]
       val obj = if (fp.isModule) loadModule(taskDef.fullyQualifiedName,loader)
-                else newInstance(taskDef.fullyQualifiedName, loader)(Seq())
+                else newInstance(taskDef.fullyQualifiedName, loader)(Seq[AnyRef]())
       obj match {
         case props: Properties => Map(props.properties: _*)
         case prop: Prop => Map("" -> prop)
@@ -118,12 +118,12 @@ private abstract class SpecLiteRunner(
         val verbosity =
           args.grouped(2).filter(twos => verbosityOpts(twos.head))
           .toSeq.headOption.map(_.last).map(_.toInt).getOrElse(0)
-        if(!result.passed) {
+      //  if(!result.passed) {
           val s = if (result.passed) GREEN + "+" + RESET else RED + "!"
           val n = if (name.isEmpty) taskDef.fullyQualifiedName else name.substring(1)
           val logMsg = s"$s $n ${pretty(result, Params(verbosity))}"
           loggers.foreach(l => l.info(logMsg))
-        }
+      //}
         Array.empty[Task]
       }
   }
@@ -142,10 +142,10 @@ final class SpecLiteFramework extends Framework {
   val name = "SpecLite"
 
   def fingerprints: Array[Fingerprint] = Array(
-    mkFP(false, "shapeless.SpecLite"),
-    mkFP(true, "shapeless.SpecLite"),
-    mkFP(false, "shapeless.test.SpecLite"),
-    mkFP(true, "shapeless.test.SpecLite")
+    mkFP(false, "catalysts.speclite.SpecLite"),
+    mkFP(true, "catalysts.speclite.SpecLite")
+   // mkFP(false, "catalysts.test.SpecLite"),
+   // mkFP(true, "shapeless.test.SpecLite")
   )
 
   def runner(args: Array[String], remoteArgs: Array[String],

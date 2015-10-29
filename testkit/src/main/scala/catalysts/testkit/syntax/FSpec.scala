@@ -2,11 +2,13 @@ package catalysts
 package testkit
 package syntax
 
-trait FSpec[Tk <: TestKit] {self : TestSpec[Tk] => 
+trait FSpec { self : TestSpec =>
+
   def it(s: String)(a: => Any) = block(s)(a)
+
   def describe(s: String)(a: => Any) = nest(s)(a)
 }
 
-
-trait FSpecMatchers [Tk <: TestKit] extends FSuiteMatchers[Tk] { self : TestSpec[Tk] =>
+trait FSpecMatchers extends FSuiteMatchers {
+  self: TestKit =>
 }

@@ -1,2 +1,1 @@
-
-addSbtPlugin("com.github.inthenow" % "sbt-catalysts" % "0.1.3")
+addSbtPlugin("com.github.inthenow" % "sbt-catalysts" % "0.1.4")

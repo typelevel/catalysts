@@ -9,8 +9,4 @@ trait TestKit {
   type TestEqual[A]
   type TestNest
   type TestShow[A]
-
-  // Types related to Laws
-  type Params
-  type Structure
 }

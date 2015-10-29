@@ -4,9 +4,7 @@ package testkit
 /**
  * 
  */
-trait TestSuite
-  extends TestNotifications 
-  with    StdTest { self: TestSettings =>
+trait TestSuite extends TestNotifications with StdTest { self: TestSettings =>
 
   notifyTestLoading()
   val mod = testType * getTestMode  

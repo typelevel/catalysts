@@ -3,7 +3,6 @@ package tests
 
 import catalysts.macros.ClassInfo._
 import catalysts.macros._
-import catalysts.scalatest.TestSuite
 
 class MacroTests extends TestSuite {
 
