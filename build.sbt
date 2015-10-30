@@ -39,12 +39,12 @@ lazy val rootPrj = project
 
 lazy val rootJVM = project
   .configure(mkRootJvmConfig(gh.proj, rootSettings, commonJvmSettings))
-  .aggregate(checkliteJVM, macrosJVM, platformJVM, scalatestJVM, specs2, specliteJVM, testkitJVM, testsJVM, docs)
-  .dependsOn(checkliteJVM, macrosJVM, platformJVM, scalatestJVM, specs2, specliteJVM, testkitJVM, testsJVM % "compile;test-internal -> test")
+  .aggregate(checkliteJVM, lawkitJVM, macrosJVM, platformJVM, scalatestJVM, specs2, specbaseJVM, specliteJVM, testkitJVM, testsJVM, docs)
+  .dependsOn(checkliteJVM, lawkitJVM, macrosJVM, platformJVM, scalatestJVM, specs2, specbaseJVM,specliteJVM, testkitJVM, testsJVM % "compile;test-internal -> test")
 
 lazy val rootJS = project
   .configure(mkRootJsConfig(gh.proj, rootSettings, commonJsSettings))
-  .aggregate(checkliteJS, macrosJS, platformJS, scalatestJS, specliteJS, testkitJS, testsJS)
+  .aggregate(checkliteJS, lawkitJS, macrosJS, platformJS, scalatestJS, specbaseJS, specliteJS, testkitJS, testsJS)
 
 /**
  * CheckLite - cross project that implements a basic test framework, based on ScalaCheck.
@@ -112,6 +112,15 @@ lazy val lawkitM   = module("lawkit", CrossType.Pure)
   .settings(disciplineDependencies:_*)
 
 /**
+ * SpecBase - cross project that ...
+ */
+lazy val specbase    = prj(specbaseM)
+lazy val specbaseJVM = specbaseM.jvm
+lazy val specbaseJS  = specbaseM.js
+lazy val specbaseM   = module("specbase", CrossType.Pure)
+  .dependsOn(testkitM)
+
+/**
  * Testkit - cross project that defines test utilities that can be re-used in other libraries, as well as 
  *         all the tests for this build.
  */
@@ -129,7 +138,7 @@ lazy val speclite    = prj(specliteM)
 lazy val specliteJVM = specliteM.jvm
 lazy val specliteJS  = specliteM.js
 lazy val specliteM   =  module("speclite", CrossType.Pure)
-  .dependsOn(platformM, testkitM % "compile; test -> test")
+  .dependsOn(platformM, testkitM % "compile; test -> test", specbaseM)
   .settings(testFrameworks := Seq(new TestFramework("catalysts.speclite.SpecLiteFramework")))
   .jvmSettings(libraryDependencies += "org.scala-sbt" %  "test-interface" % "1.0")
   .jvmSettings(libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion) // % "provided", 

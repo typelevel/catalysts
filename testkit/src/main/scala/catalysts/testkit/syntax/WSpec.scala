@@ -58,6 +58,17 @@ class WSpecMatchersMacros(val c: whitebox.Context)  {
     val lhs = unpack
     q"assert_ThrowImpl[$aTpe, $tTpe]($lhs)"
   }
+
+  def tryUnpack[A]: Tree  = {
+    val msg = try {
+      unpack
+      ""
+    } catch {
+      case e:Throwable => e.getMessage
+    }
+    q"$msg"
+  }
+
 }
 
 
