@@ -138,7 +138,7 @@ lazy val speclite    = prj(specliteM)
 lazy val specliteJVM = specliteM.jvm
 lazy val specliteJS  = specliteM.js
 lazy val specliteM   =  module("speclite", CrossType.Pure)
-  .dependsOn(platformM, testkitM % "compile; test -> test", specbaseM)
+  .dependsOn(platformM, testkitM % "compile; test -> test", specbaseM % "compile; test -> test")
   .settings(testFrameworks := Seq(new TestFramework("catalysts.speclite.SpecLiteFramework")))
   .jvmSettings(libraryDependencies += "org.scala-sbt" %  "test-interface" % "1.0")
   .jvmSettings(libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion) // % "provided", 

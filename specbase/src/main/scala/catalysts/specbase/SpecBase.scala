@@ -14,7 +14,7 @@ trait SpecBase[P,PS] {
 
   def fail(msg: String): Nothing = throw new AssertionError(msg)
 
-  abstract class StringOps(s: String) {
+  abstract class SpecBaseStringOps(s: String) {
 
     def should[A](a: => Any): Unit = {
       val saved = context
@@ -25,7 +25,7 @@ trait SpecBase[P,PS] {
         context = saved
       }
     }
-    def ![A](a: => A)(implicit ev: (=> A) => P): Unit = in(a)
+  //  def ![A](a: => A)(implicit ev: (=> A) => P): Unit = in(a)
 
     def in[A](a: => A)(implicit ev: (=> A) => P): Unit
   }
@@ -98,10 +98,10 @@ trait SpecBase[P,PS] {
   }
 
   implicit def propToProp(p: => P): P = p
-  implicit def check1[T, R](result: T => R): P= booleanToProp(true)
+ // implicit def check1[T, R](result: T => R): P= booleanToProp(true)
   implicit def anyToProp(u: => Any): P = booleanToProp({u; true})
-  implicit def unitToProp(u: => Unit): P = booleanToProp({u; true})
-  implicit def unitToProp2(u: Unit): P = booleanToProp(true)
+ // implicit def unitToProp(u: => Unit): P = booleanToProp({u; true})
+ // implicit def unitToProp2(u: Unit): P = booleanToProp(true)
   implicit def booleanToProp(b: => Boolean): P
 
 }

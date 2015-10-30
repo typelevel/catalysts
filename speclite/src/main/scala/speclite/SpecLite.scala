@@ -22,7 +22,7 @@ abstract class SpecLite extends Properties("") with SpecBase[Prop, Properties]{
 
   override val name:String =  className(this)
 
-  implicit class StringOps2(s: String) extends StringOps(s){
+  implicit class SpecLiteStringOps(s: String) extends SpecBaseStringOps(s){
 
     def in[A](a: => A)(implicit ev: (=> A) => Prop): Unit = {
       property(context + ":" + s) = new InStringOps(a)
