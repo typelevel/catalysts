@@ -15,7 +15,7 @@ import org.specs2.execute.{AsResult, AnyValueAsResult}
 trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
     with ScalaCheck with TestKit  {
 
-  val frf = fragmentFactory
+//  val frf = fragmentFactory
 
   def assertEqEqImpl[A](actual: => A, expected: => A): AssertResult = {
     actual must_== expected
@@ -26,7 +26,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
   }
 
   def assertEqEqEqImpl[A](actual: => A, expected: => A)
-     (implicit show: Show[A], equal: Equal[A]): AssertResult =
+      (implicit show: Show[A], equal: Equal[A]): AssertResult =
     actual must_=== expected
 
   def assert_ThrowImpl[A, T<:Throwable](actual: => A)(implicit m: ClassTag[T]): ExceptionResult = {
@@ -44,13 +44,11 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
      assert_==(failed, failed.isEmpty, true)
   }
 
-  def block(s: String)(a: => Any): TestBlock =  {
+  def block(s: String)(a: => Any): TestBlock =
     s in new AnyValueAsResult().asResult(a)
-  }
 
-  def nest(s: String)(a: => Any): TestNest = {
-   s >> a.asInstanceOf[TestBlock]
-  }
+  def nest(s: String)(a: => Any): TestNest =
+    s >> a.asInstanceOf[TestBlock]
 
   import org.specs2.execute.AnyValueAsResult
   implicit def anyVal[R]:AsResult[R] = new AnyValueAsResult[R]
