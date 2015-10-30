@@ -10,9 +10,9 @@ import Prop.Arg
 sealed trait Pretty extends Serializable {
   def apply(prms: Pretty.Params): String
 
-  def map(f: String => String) = Pretty(prms => f(Pretty.this(prms)))
+//  def map(f: String => String) = Pretty(prms => f(Pretty.this(prms)))
 
-  def flatMap(f: String => Pretty) = Pretty(prms => f(Pretty.this(prms))(prms))
+//  def flatMap(f: String => Pretty) = Pretty(prms => f(Pretty.this(prms))(prms))
 }
 
 object Pretty {
@@ -31,6 +31,7 @@ object Pretty {
     def /(s2: String) = if(s2 == "") s1 else s1+"\n"+s2
   }
 
+  /*
   def pad(s: String, c: Char, length: Int) =
     if(s.length >= length) s
     else s + List.fill(length-s.length)(c).mkString
@@ -59,11 +60,11 @@ object Pretty {
     loop(0)
     builder.result()
   }
-
+*/
   implicit def prettyAny(t: Any) = Pretty { p => t.toString }
 
-  implicit def prettyString(t: String) = Pretty { p => "\""++escapeControlChars(t)++"\"" }
-
+ // implicit def prettyString(t: String) = Pretty { p => "\""++escapeControlChars(t)++"\"" }
+/*
   implicit def prettyList(l: List[Any]) = Pretty { p =>
     l.map("\""+_+"\"").mkString("List(", ", ", ")")
   }
@@ -81,7 +82,7 @@ object Pretty {
 
     e.getClass.getName + ": " + e.getMessage / strs2.mkString("\n")
   }
-
+  */
   def prettyArgs(args: Seq[Arg[Any]]): Pretty = Pretty { prms =>
     if(args.isEmpty) "" else {
       for((a,i) <- args.zipWithIndex) yield {
@@ -94,24 +95,26 @@ object Pretty {
     }.mkString("\n")
   }
 
-  implicit def prettyTestRes(res: SpecLiteTest.Result) = Pretty { prms =>
-    def labels(ls: collection.immutable.Set[String]) =
-      if(ls.isEmpty) ""
-      else "> Labels of failing property: " / ls.mkString("\n")
-    val s = res.status match {
-      case SpecLiteTest.Proved(args) => "" //"OK, proved property."/prettyArgs(args)(prms)
-      case SpecLiteTest.Passed => "OK, passed "+res.succeeded+" tests."
-      case SpecLiteTest.Failed(args, l) =>
-        "Falsified after "+res.succeeded+" passed tests."/labels(l)/prettyArgs(args)(prms)
-      case SpecLiteTest.Exhausted =>
-        "Gave up after only "+res.succeeded+" passed tests. " +
-        res.discarded+" tests were discarded."
-      case SpecLiteTest.PropException(args,e,l) => s"failed: ${e.getMessage}"
-         //"Exception raised on property evaluation."/labels(l)/prettyArgs(args)(prms)/
+  implicit def prettyTestRes(res: SpecLiteTest.Result) =  {
+    Pretty { prms =>
+      def labels(ls: collection.immutable.Set[String]) =
+        if(ls.isEmpty) ""
+        else "> Labels of failing property: " / ls.mkString("\n")
+      val s = res.status match {
+        case SpecLiteTest.Proved(args) => "" //"OK, proved property."/prettyArgs(args)(prms)
+        case SpecLiteTest.Passed => "OK, passed "+res.succeeded+" tests."
+        case SpecLiteTest.Failed(args, l) =>
+          "Falsified after "+res.succeeded+" passed tests."/labels(l)/prettyArgs(args)(prms)
+        case SpecLiteTest.Exhausted =>
+          "Gave up after only "+res.succeeded+" passed tests. " +
+            res.discarded+" tests were discarded."
+       case SpecLiteTest.PropException(args,e,l) => s"failed: ${e.getMessage}"
+        //"Exception raised on property evaluation."/labels(l)/prettyArgs(args)(prms)/
         //RED + "> Exception: " + e.getMessage // pretty(e,prms)
+      }
+      val t = if(prms.verbosity <= 1) "" else "Elapsed time: "+prettyTime(res.time)
+      s/t //pretty(res.freqMap,prms)
     }
-    val t = if(prms.verbosity <= 1) "" else "Elapsed time: "+prettyTime(res.time)
-    s/t //pretty(res.freqMap,prms)
   }
 
   def prettyTime(millis: Long): String = {

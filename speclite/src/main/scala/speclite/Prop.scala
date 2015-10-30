@@ -8,13 +8,13 @@ class Properties(val name: String) extends Prop {
 
   /** Returns one property which holds if and only if all of the
     *  properties in this property collection hold */
-  private def oneProperty: Prop = Prop.all((properties map (_._2)):_*)
+ private def oneProperty: Prop = Prop.all((properties map (_._2)):_*)
 
   /** Returns all properties of this collection in a list of name/property
     *  pairs.  */
   def properties: Seq[(String,Prop)] = props
 
-  def apply(p: Gen.Parameters) = oneProperty(p)
+ def apply(p: Gen.Parameters) = oneProperty(p)
 
   class PropertySpecifier() {
     def update(propName: String, p: Prop) = props += ((name+"."+propName, p))
@@ -35,21 +35,21 @@ class PropFromFun(f: Gen.Parameters => Prop.Result) extends Prop {
 @scala.scalajs.js.annotation.JSExportDescendentObjects
 trait Prop {
 
-  import Prop.{Result, secure}
+  import Prop.{Result}//, secure}
   import Gen.Parameters
 
-  def apply(prms: Parameters): Result
+ def apply(prms: Parameters): Result
 
-  def map(f: Result => Result): Prop = Prop(prms => f(this(prms)))
+ // def map(f: Result => Result): Prop = Prop(prms => f(this(prms)))
 
-  def flatMap(f: Result => Prop): Prop = Prop(prms => f(this(prms))(prms))
+ // def flatMap(f: Result => Prop): Prop = Prop(prms => f(this(prms))(prms))
 
-  def combine(p: Prop)(f: (Result, Result) => Result) =
-    for(r1 <- this; r2 <- p) yield f(r1,r2)
+//  def combine(p: Prop)(f: (Result, Result) => Result) =
+//    for(r1 <- this; r2 <- p) yield f(r1,r2)
 
-  def &&(p: => Prop) = combine(secure(p))(_ && _)
+//  def &&(p: => Prop) = combine(secure(p))(_ && _)
 
-  override def toString = "Prop"
+//  override def toString = "Prop"
 }
 
 object Prop {
@@ -109,6 +109,7 @@ object Prop {
      if(ps.isEmpty) proved
      else Prop(prms => ps.map(p => p(prms)).reduceLeft(_ && _)
    )
+
    def exception(e: Throwable): Prop = Prop(Result(status = Exception(e)))
 
    def secure[P](p: => P)(implicit ev: P => Prop): Prop =

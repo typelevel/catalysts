@@ -317,13 +317,14 @@ object SpecLiteTest {
             stop = true
         }
       }
-      if (res == null) {
-        if (maxDiscardRatio*n > d) Result(Passed, n, d)
-        else Result(Exhausted, n, d)
-      } else res
+      res
+      //if (res == null) {
+      //  if (maxDiscardRatio*n > d) Result(Passed, n, d)
+      //  else Result(Exhausted, n, d)
+      //} else res
     }
 
-    def mergeResults(r1: Result, r2: Result): Result = {
+ /*   def mergeResults(r1: Result, r2: Result): Result = {
       val Result(st1, s1, d1, _) = r1
       val Result(st2, s2, d2, _) = r2
       if (st1 != Passed && st1 != Exhausted)
@@ -337,7 +338,7 @@ object SpecLiteTest {
           Result(Exhausted, s1+s2, d1+d2, 0)
       }
     }
-
+*/
     val start = System.currentTimeMillis
 
     val r =
@@ -407,12 +408,14 @@ private[speclite] trait CmdLineParser {
 
   val opts: Set[Opt[_]]
 
+
   private def getOpt(s: String) = {
     if(s == null || s.length == 0 || s.charAt(0) != '-') None
     else opts.find(_.names.contains(s.drop(1)))
   }
 
   private def getStr(s: String) = Some(s)
+
 
   private def getInt(s: String) =
     if (s != null && s.length > 0 && s.forall(_.isDigit)) Some(s.toInt)

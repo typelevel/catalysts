@@ -53,7 +53,7 @@ lazy val checklite    = prj(checkliteM)
 lazy val checkliteJVM = checkliteM.jvm
 lazy val checkliteJS  = checkliteM.js
 lazy val checkliteM   = module("checklite", CrossType.Pure)
-  .dependsOn(testkitM % "compile; test -> test", lawkitM % "compile; test -> test")
+  .dependsOn(testkitM % "compile; test -> test", lawkitM % "compile; test -> test", specbaseM % "compile; test -> test")
   .settings(disciplineDependencies:_*)
   .settings(addLibs(vAll, "scalacheck"):_*)
   .jvmSettings(libraryDependencies += "org.scala-sbt" %  "test-interface" % "1.0")
@@ -184,4 +184,7 @@ lazy val disciplineDependencies = Seq(addLibs(vAll, "discipline", "scalacheck" )
 
 lazy val publishSettings = sharedPublishSettings(gh, devs) ++ credentialSettings ++ sharedReleaseProcess
 
-lazy val scoverageSettings = sharedScoverageSettings(60)
+import scoverage.ScoverageSbtPlugin._
+lazy val scoverageSettings = sharedScoverageSettings(60) ++ Seq(
+  ScoverageKeys.coverageExcludedPackages := "catalysts\\.Platform"
+)

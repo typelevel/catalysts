@@ -57,6 +57,7 @@ private abstract class SpecLiteRunner(
     def execute(handler: EventHandler, loggers: Array[Logger],
       continuation: Array[Task] => Unit
     ): Unit  = continuation(execute(handler,loggers))
+
   }
 
   def rootTask(td: TaskDef) = new BaseTask(td) {
@@ -167,15 +168,14 @@ final class SpecLiteFramework extends Framework {
       s"$heading: Total $testCount, Failed $failureCount, Errors $errorCount, Passed $successCount"
     }
   }
-
   def slaveRunner(args: Array[String], remoteArgs: Array[String],
-      loader: ClassLoader, send: String => Unit): Runner =
+                  loader: ClassLoader, send: String => Unit): Runner =
     new SpecLiteRunner(args, remoteArgs, loader) {
       def receiveMessage(msg: String) = None
 
       def done = {
         send(s"d$testCount,$successCount,$failureCount,$errorCount")
-      ""
+        ""
+      }
     }
-  }
 }

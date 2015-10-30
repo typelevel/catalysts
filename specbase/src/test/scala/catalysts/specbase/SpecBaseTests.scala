@@ -10,6 +10,8 @@ trait  SpecBaseTests[P,PS] extends SpecBase[P,PS] {
 
   1 mustBe_< 2
 
+  (2 mustBe_< 2).mustThrowA[AssertionError]
+
   val fTrue: PartialFunction[Boolean, Boolean] = { case b => b == true }
   val fFalse: PartialFunction[Int, Boolean] = { case x => false }
 
@@ -20,4 +22,6 @@ trait  SpecBaseTests[P,PS] extends SpecBase[P,PS] {
   this mustBeTheSameAs this
 
   (List(false) mustBeTheSameAs List(true)).mustThrowA[AssertionError]
+
+
 }
