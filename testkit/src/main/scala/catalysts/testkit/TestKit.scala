@@ -3,9 +3,11 @@ package testkit
 
 trait TestKit {
 
-  // Types related to Laws
-  type Laws
-  type Params
-  type RuleSet
-  type Structure
+  // Types related to test type
+  type AssertResult
+  type ExceptionResult
+  type TestBlock
+  type TestEqual[A]
+  type TestNest
+  type TestShow[A]
 }

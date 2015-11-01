@@ -1,7 +1,6 @@
 package catalysts
 package tests
 
-import catalysts.scalatest.TestSuite
 import catalysts.testkit.{StdTest, StressTestMode, TestModifier, TestNotifications, TestSettings, WellTested}
 
 class StdTestTests extends TestSuite with scalatest.DisableTripleEquals {

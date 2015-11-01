@@ -4,7 +4,7 @@ package testkit
 import catalysts.macros.ClassInfo._
 
 trait TestInfo {
-  def testName = className(this).split('.').last
+  def testName:String = className(this).split('.').last
 
-  def projectKey = "catalysts"
+  def projectKey:String = className(this).split('.').head
 }
