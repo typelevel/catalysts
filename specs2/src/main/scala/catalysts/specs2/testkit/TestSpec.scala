@@ -15,8 +15,6 @@ import org.specs2.execute.{AsResult, AnyValueAsResult}
 trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
     with ScalaCheck with TestKit  {
 
-//  val frf = fragmentFactory
-
   def assertEqEqImpl[A](actual: => A, expected: => A): AssertResult = {
     actual must_== expected
   }
@@ -54,7 +52,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
   implicit def anyVal[R]:AsResult[R] = new AnyValueAsResult[R]
 
   def forAllImpl1[T1, R](fun: (T1) => R)(implicit
-      arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1]): AssertResult = {
+      arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1]): ForAllResult = {
 
     val p: ScalaCheckProperty = prop(fun)
     check(p.prop, p.parameters, p.prettyFreqMap)
@@ -62,7 +60,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
 
   def forAllImpl2[T1, T2, R](fun: (T1, T2) => R)(implicit
       arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1],
-      arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2]): AssertResult = {
+      arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2]): ForAllResult = {
 
     val p: ScalaCheckProperty = prop(fun)
     check(p.prop, p.parameters, p.prettyFreqMap)
@@ -71,7 +69,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
   def forAllImpl3[T1, T2, T3, R](fun: (T1, T2, T3) => R)(implicit
       arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1],
       arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2],
-      arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3]): AssertResult = {
+      arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3]): ForAllResult = {
 
     val p: ScalaCheckProperty = prop(fun)
     check(p.prop, p.parameters, p.prettyFreqMap)
@@ -81,7 +79,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
       arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1],
       arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2],
       arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3],
-      arbD : Arbitrary[T4], shrD : Shrink[T4], pretty4: Prettify[T4]): AssertResult = {
+      arbD : Arbitrary[T4], shrD : Shrink[T4], pretty4: Prettify[T4]): ForAllResult = {
 
     val p: ScalaCheckProperty = prop(fun)
     check(p.prop, p.parameters, p.prettyFreqMap)
@@ -92,7 +90,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
       arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2],
       arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3],
       arbD : Arbitrary[T4], shrD : Shrink[T4], pretty4: Prettify[T4],
-      arbE : Arbitrary[T5], shrE : Shrink[T5], pretty5: Prettify[T5]): AssertResult = {
+      arbE : Arbitrary[T5], shrE : Shrink[T5], pretty5: Prettify[T5]): ForAllResult = {
 
     val p: ScalaCheckProperty = prop(fun)
     check(p.prop, p.parameters, p.prettyFreqMap)
@@ -104,7 +102,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with SpecificationLike
       arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3],
       arbD : Arbitrary[T4], shrD : Shrink[T4], pretty4: Prettify[T4],
       arbE : Arbitrary[T5], shrE : Shrink[T5], pretty5: Prettify[T5],
-      arbF : Arbitrary[T6], shrF : Shrink[T6], pretty6: Prettify[T6]): AssertResult = {
+      arbF : Arbitrary[T6], shrF : Shrink[T6], pretty6: Prettify[T6]): ForAllResult = {
 
     val p: ScalaCheckProperty = prop(fun)
     check(p.prop, p.parameters, p.prettyFreqMap)

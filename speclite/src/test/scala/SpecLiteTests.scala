@@ -73,13 +73,14 @@ class SpecliteCoreTests extends Suite {
   val prr: Prop = Prop.apply(badParamToResult: Gen.Parameters => Prop.Result)
   prr(Gen.Parameters.default)
 
-  Prop.all(Prop(true))
+  Prop.all(Prop(1 == 1))
 
   val pEmpty = Seq[Prop]()
   pEmpty.isEmpty must_== true
   Prop.all(pEmpty)
 
-  val ps1 = new Properties("MyProps").apply(Gen.Parameters.default)
+  val ps1 = new Properties("MyProps")
+  ps1.apply(Gen.Parameters.default)
 
   def sender(s: String): Unit = ()
   val spf = new SpecLiteFramework
@@ -124,6 +125,10 @@ class SpecliteCoreTests extends Suite {
   SpecLiteTest.check(Parameters.default, ps1)
   SpecLiteTest.check(Parameters.default, pEmpty)
 
+  ps1.property.update("Little", Prop(1 == 1))
+  val cps = SpecLiteTest.checkProperties(Parameters.default, ps1)
+
+
   val parm1 = catalysts.speclite.Gen.Parameters.default
   parm1.size  must_== 100
 
@@ -144,18 +149,18 @@ class SpecliteCoreTests extends Suite {
 
   val tcb1 = new TestCallback {}
   tcb1.onPropEval("S", 1, 1, 1) must_== (())
-
   tcb1.onTestResult("S",Result(Passed, 1, 1) )  must_== (())
+
   val tcb2 =  tcb1.chain(new TestCallback {})
   tcb2.onPropEval("S2", 1, 1, 1) must_== (())
+  tcb2.onTestResult("S",Result(Passed, 1, 1) )  must_== (())
 
   block("CmdLineParser Tests") {
 
     import scala.language.reflectiveCalls
     cmdLineParser.parseParams(Array[String]("-maxSize", "5", "-maxDiscardRatio", "5.0", "-minSuccessfulTests", "33", "-workers", "1", "-verbosity", "1"))
 
-    cmdLineParser.parseParams(Array[String]("-maxDiscardRatio", "Hello", "-verbosity", ""))
-
+    cmdLineParser.parseParams(Array[String]("-maxDiscardRatio", "Hello", "-verbosity", "", "-minSuccessfulTests", "Hello"))
 
     cmdLineParser.printHelp()
 

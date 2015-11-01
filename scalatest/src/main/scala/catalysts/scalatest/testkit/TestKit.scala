@@ -4,7 +4,6 @@ package testkit
 
 import catalysts.testkit.{TestKit => BaseTestKit}
 import catalysts.lawkit.{LawKit => BaseLawKit}
-import org.scalatest.prop.Configuration.PropertyCheckConfiguration
 import org.scalatest.Assertion
 
 trait TestKit extends BaseLawKit with BaseTestKit {
@@ -18,6 +17,8 @@ trait TestKit extends BaseLawKit with BaseTestKit {
   type TestShow[A] = Unit
 
   // Types related to Laws
-  type Params = PropertyCheckConfiguration
   type Structure = Unit
+
+  // Types related to Property testing
+  type ForAllResult = Assertion
 }

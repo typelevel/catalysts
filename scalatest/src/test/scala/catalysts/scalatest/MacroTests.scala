@@ -3,9 +3,7 @@ package scalatest
 
 import catalysts.macros.ClassInfo._
 import catalysts.macros._
-
 import org.scalatest.WordSpec
-
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 class MacroTests extends Suite with GeneratorDrivenPropertyChecks{

@@ -2,7 +2,6 @@ package catalysts
 package specbase
 
 import catalysts.testkit.{Equal, Show}
-
 import scala.reflect.ClassTag
 
 trait SpecBase[P,PS] {
@@ -25,7 +24,6 @@ trait SpecBase[P,PS] {
         context = saved
       }
     }
-  //  def ![A](a: => A)(implicit ev: (=> A) => P): Unit = in(a)
 
     def in[A](a: => A)(implicit ev: (=> A) => P): Unit
   }
@@ -98,10 +96,6 @@ trait SpecBase[P,PS] {
   }
 
   implicit def propToProp(p: => P): P = p
- // implicit def check1[T, R](result: T => R): P= booleanToProp(true)
   implicit def anyToProp(u: => Any): P = booleanToProp({u; true})
- // implicit def unitToProp(u: => Unit): P = booleanToProp({u; true})
- // implicit def unitToProp2(u: Unit): P = booleanToProp(true)
   implicit def booleanToProp(b: => Boolean): P
-
 }

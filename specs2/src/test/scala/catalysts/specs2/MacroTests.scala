@@ -28,7 +28,6 @@ class MacroTests extends Suite with ScalaCheck {
     }
   }
 
-
   "fold and cata consistent" >> {
     all { (o: Option[Int], s: String, f: Int => String) =>
       o.fold(s)(f) == o.fold(s)(f)

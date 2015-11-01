@@ -10,21 +10,12 @@ import catalysts.testkit.{TestSettings, TestSuite => BaseTestSuite}
  */
 trait Test extends BaseTestSuite with TestSettings   {
 
-/*
-def checkConfiguration(mode:TestModifier): Parameters = {
-    val (min,max) = checkSettings(mode)
-    Parameters(minTestsOk = min, maxDiscardRatio = max.toFloat)
-  }
- */
   def notifyTestLoading(): Unit = {
     import scala.Console.{GREEN, RESET}
 
     if (shouldNotify)
       println(s"${RESET}[info] ${GREEN} ${testName} loading...${RESET}") // scalastyle:ignore
   }
-
- // implicit val params = checkConfiguration(mod)
- 
 }
 
 /**

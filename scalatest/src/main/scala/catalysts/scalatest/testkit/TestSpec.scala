@@ -42,25 +42,25 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with FunSpecLike
 
 
   def forAllImpl1[T1, R] (fun: (T1) => R)(implicit
-      arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1]): AssertResult =
+      arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1]): ForAllResult =
     forAll(fun.asInstanceOf[(T1) => Assertion])
 
   def forAllImpl2[T1, T2, R](fun: (T1, T2) => R)(implicit
       arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1],
-      arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2]): AssertResult =
+      arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2]): ForAllResult =
     forAll(fun.asInstanceOf[(T1, T2) => Assertion])
 
   def forAllImpl3[T1, T2, T3, R](fun: (T1, T2, T3) => R)(implicit
       arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1],
       arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2],
-      arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3]): AssertResult =
+      arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3]): ForAllResult =
     forAll(fun.asInstanceOf[(T1, T2, T3) => Assertion])
 
   def forAllImpl4[T1, T2, T3, T4, R](fun: (T1, T2, T3, T4) => R)(implicit
       arbA : Arbitrary[T1], shrA : Shrink[T1], pretty1: Prettify[T1],
       arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2],
       arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3],
-      arbD : Arbitrary[T4], shrD : Shrink[T4], pretty4: Prettify[T4]): AssertResult =
+      arbD : Arbitrary[T4], shrD : Shrink[T4], pretty4: Prettify[T4]): ForAllResult =
     forAll(fun.asInstanceOf[(T1, T2, T3, T4) => Assertion])
 
   def forAllImpl5[T1, T2, T3, T4, T5, R](fun: (T1, T2, T3, T4, T5) => R)(implicit
@@ -68,7 +68,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with FunSpecLike
       arbB : Arbitrary[T2], shrB : Shrink[T2], pretty2: Prettify[T2],
       arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3],
       arbD : Arbitrary[T4], shrD : Shrink[T4], pretty4: Prettify[T4],
-      arbE : Arbitrary[T5], shrE : Shrink[T5], pretty5: Prettify[T5]): AssertResult =
+      arbE : Arbitrary[T5], shrE : Shrink[T5], pretty5: Prettify[T5]): ForAllResult =
     forAll(fun.asInstanceOf[(T1, T2, T3, T4, T5) => Assertion])
 
   def forAllImpl6[T1, T2, T3, T4, T5, T6, R](fun: (T1, T2, T3, T4, T5, T6) => R)(implicit
@@ -77,7 +77,7 @@ trait TestSpec extends BaseTestSpec with BaseLawSpec with FunSpecLike
        arbC : Arbitrary[T3], shrC : Shrink[T3], pretty3: Prettify[T3],
        arbD : Arbitrary[T4], shrD : Shrink[T4], pretty4: Prettify[T4],
        arbE : Arbitrary[T5], shrE : Shrink[T5], pretty5: Prettify[T5],
-       arbF : Arbitrary[T6], shrF : Shrink[T6], pretty6: Prettify[T6]): AssertResult =
+       arbF : Arbitrary[T6], shrF : Shrink[T6], pretty6: Prettify[T6]): ForAllResult =
     forAll(fun.asInstanceOf[(T1, T2, T3, T4, T5, T6) => Assertion])
 
 

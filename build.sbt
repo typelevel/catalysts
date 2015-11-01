@@ -1,5 +1,5 @@
-import org.typelevel.Dependencies._
-
+import org.typelevel.{Dependencies => typelevel}
+import org.typelevel.catalysts.{Dependencies => catalysts}
 /**
  * These aliases serialise the build for the benefit of Travis-CI, also useful for pre-PR testing.
  * If new projects are added to the build, these must be updated.
@@ -19,9 +19,9 @@ addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVe
 val gh = GitHubSettings(org = "InTheNow", proj = "catalysts", publishOrg = "org.typelevel", license = apache)
 val devs = Seq(Dev("Alistair Johnson", "inthenow"))
 
-val vers = versions // to add/overide versions: val vers = versions + ("discipline" -> "0.3")
-val libs = libraries
-val addins = scalacPlugins
+val vers = typelevel.versions ++ catalysts.versions
+val libs = typelevel.libraries ++ catalysts.libraries
+val addins = typelevel.scalacPlugins ++ catalysts.scalacPlugins
 val vAll = Versions(vers, libs, addins)
 
 /**
@@ -67,7 +67,7 @@ lazy val macros    = prj(macrosM)
 lazy val macrosJVM = macrosM.jvm
 lazy val macrosJS  = macrosM.js
 lazy val macrosM   = module("macros", CrossType.Pure)
-  .settings(macroCompatSettings(vAll):_*)
+  .settings(typelevel.macroCompatSettings(vAll):_*)
 
 /**
  * Platform - cross project that provides cross platform support
@@ -108,7 +108,7 @@ lazy val lawkitJVM = lawkitM.jvm
 lazy val lawkitJS  = lawkitM.js
 lazy val lawkitM   = module("lawkit", CrossType.Pure)
   .dependsOn(macrosM, testkitM)
-  .settings(macroCompatSettings(vAll):_*)
+  .settings(typelevel.macroCompatSettings(vAll):_*)
   .settings(disciplineDependencies:_*)
 
 /**
@@ -129,7 +129,7 @@ lazy val testkitJVM = testkitM.jvm
 lazy val testkitJS  = testkitM.js
 lazy val testkitM   = module("testkit", CrossType.Pure)
   .dependsOn(macrosM, platformM)
-  .settings(macroCompatSettings(vAll):_*)
+  .settings(typelevel.macroCompatSettings(vAll):_*)
 
 /**
  * Speclite - cross project that implements a basic test framework, with minimal external dependencies.

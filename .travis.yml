@@ -3,7 +3,7 @@ sudo: false
 install:
   - pip install --user codecov
 scala:
-- 2.10.5
+- 2.10.6
 - 2.11.7
 script:
 - scripts/travis-publish.sh

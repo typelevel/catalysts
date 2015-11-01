@@ -38,7 +38,6 @@ trait FSuiteMatchers { self : TestKit =>
 
   def assertTypedSame[A <: AnyRef](actual: A, expected: A): AssertResult =
     macro FSuiteMatchersMacros.assertTypedSame[A]
-
 }
 
 import scala.language.experimental.macros

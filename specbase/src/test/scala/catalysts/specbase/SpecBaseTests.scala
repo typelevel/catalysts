@@ -22,6 +22,4 @@ trait  SpecBaseTests[P,PS] extends SpecBase[P,PS] {
   this mustBeTheSameAs this
 
   (List(false) mustBeTheSameAs List(true)).mustThrowA[AssertionError]
-
-
 }

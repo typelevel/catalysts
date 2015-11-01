@@ -8,11 +8,8 @@ import scala.Console.RED
 import Prop.Arg
 
 sealed trait Pretty extends Serializable {
+
   def apply(prms: Pretty.Params): String
-
-//  def map(f: String => String) = Pretty(prms => f(Pretty.this(prms)))
-
-//  def flatMap(f: String => Pretty) = Pretty(prms => f(Pretty.this(prms))(prms))
 }
 
 object Pretty {
@@ -31,58 +28,8 @@ object Pretty {
     def /(s2: String) = if(s2 == "") s1 else s1+"\n"+s2
   }
 
-  /*
-  def pad(s: String, c: Char, length: Int) =
-    if(s.length >= length) s
-    else s + List.fill(length-s.length)(c).mkString
-
-  def break(s: String, lead: String, length: Int): String =
-    if(s.length <= length) s
-    else s.substring(0, length) / break(lead+s.substring(length), lead, length)
-
-  def format(s: String, lead: String, trail: String, width: Int) =
-    s.lines.map(l => break(lead+l+trail, "  ", width)).mkString("\n")
-
-  private[this] def escapeControlChars(s: String): String = {
-    val builder = new StringBuilder
-    @annotation.tailrec
-    def loop(i: Int): Unit = {
-      if(i < s.length){
-        val c = s.codePointAt(i)
-        if(Character.isISOControl(c)){
-          builder.append("\\u%04x".format(c))
-        }else{
-          builder.append(s.charAt(i))
-        }
-        loop(i + 1)
-      }
-    }
-    loop(0)
-    builder.result()
-  }
-*/
   implicit def prettyAny(t: Any) = Pretty { p => t.toString }
 
- // implicit def prettyString(t: String) = Pretty { p => "\""++escapeControlChars(t)++"\"" }
-/*
-  implicit def prettyList(l: List[Any]) = Pretty { p =>
-    l.map("\""+_+"\"").mkString("List(", ", ", ")")
-  }
-
-  implicit def prettyThrowable(e: Throwable) = Pretty { prms =>
-    val strs = e.getStackTrace.map { st =>
-      import st._
-      getClassName+"."+getMethodName + "("+getFileName+":"+getLineNumber+")"
-    }
-
-    val strs2 =
-      if(prms.verbosity <= 0) Array[String]()
-      else if(prms.verbosity <= 1) strs.take(5)
-      else strs
-
-    e.getClass.getName + ": " + e.getMessage / strs2.mkString("\n")
-  }
-  */
   def prettyArgs(args: Seq[Arg[Any]]): Pretty = Pretty { prms =>
     if(args.isEmpty) "" else {
       for((a,i) <- args.zipWithIndex) yield {

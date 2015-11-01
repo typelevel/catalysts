@@ -18,6 +18,8 @@ trait TestKit extends BaseLawKit with BaseTestKit {
   type TestShow[A] = Unit
 
   // Types related to Laws
-  type Params = org.specs2.scalacheck.Parameters
   type Structure = Fragments
+
+  // Types related to Property testing
+  type ForAllResult = Result
 }
