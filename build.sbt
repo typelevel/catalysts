@@ -11,18 +11,39 @@ addCommandAlias("validateJVM", ";scalastyle;rootJVM/test")
 addCommandAlias("validateJS",  ";rootJS/test")
 addCommandAlias("validate",    ";validateJS;validateJVM")
 addCommandAlias("validateAll", s""";++${vers("scalac")};+clean;+validate;++${vers("scalac")};docs/makeSite""") 
-addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVersion.value.get + \"-SNAPSHOT\"")
+
+val ss =  "0.1.7-SNAPSHOT"
 
 /**
  * Project settings
  */
-val gh = GitHubSettings(org = "InTheNow", proj = "catalysts", publishOrg = "org.typelevel", license = apache)
+
+val gh = GitHubSettings(org = "InTheNow", proj = "catalysts", properName = "Catalysts", publishOrg = "org.typelevel", license = apache)
+
 val devs = Seq(Dev("Alistair Johnson", "inthenow"))
 
-val vers = typelevel.versions ++ catalysts.versions
-val libs = typelevel.libraries ++ catalysts.libraries
+val packages = Seq("discipline", "macro-compat", "paradise", "scalac", "scalac_2.10", "scalacheck",
+                   "scalatest", "specs2", "specs2-core", "specs2-scalacheck")
+
+// Not used, for example only
+val updates = Map(
+  "macro-compat" -> "1.1.0",
+  "export-hook" -> "1.1.0",
+  "simulacrum" -> "0.5.0"
+)
+
+val vers = (typelevel.versions ++ catalysts.versions /* ++ updates */).filterKeys(packages.contains(_))
+          
+val libs = (typelevel.libraries ++ catalysts.libraries) .filterKeys(packages.contains(_))
+val repos = typelevel.repos
 val addins = typelevel.scalacPlugins ++ catalysts.scalacPlugins
-val vAll = Versions(vers, libs, addins)
+val deps = Dependencies(vers, libs, repos, addins)
+val mimaPreviousVersion = "" //"0.0.2"
+
+// Pass these settings into sbt...
+catalystsProjectVersions := updates
+catalystsSettings := CatalystsSettings(gh, devs, deps)
+
 
 /**
  * catalysts - This is the root project that aggregates the catalystsJVM and catalystsJS sub projects
@@ -55,7 +76,7 @@ lazy val checkliteJS  = checkliteM.js
 lazy val checkliteM   = module("checklite", CrossType.Pure)
   .dependsOn(testkitM % "compile; test -> test", lawkitM % "compile; test -> test", specbaseM % "compile; test -> test")
   .settings(disciplineDependencies:_*)
-  .settings(addLibs(vAll, "scalacheck"):_*)
+  .settings(addLibs(deps, "scalacheck"):_*)
   .jvmSettings(libraryDependencies += "org.scala-sbt" %  "test-interface" % "1.0")
   .jvmSettings(libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion) // % "provided",
   .jsSettings( libraryDependencies += "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion)
@@ -67,7 +88,8 @@ lazy val macros    = prj(macrosM)
 lazy val macrosJVM = macrosM.jvm
 lazy val macrosJS  = macrosM.js
 lazy val macrosM   = module("macros", CrossType.Pure)
-  .settings(typelevel.macroCompatSettings(vAll):_*)
+  .settings(typelevel.macroCompatSettings(deps):_*)
+  .jvmSettings(mimaSettings:_*)
 
 /**
  * Platform - cross project that provides cross platform support
@@ -87,7 +109,7 @@ lazy val scalatestJS  = scalatestM.js
 lazy val scalatestM   = module("scalatest", CrossType.Pure)
   .dependsOn(testkitM % "compile; test -> test", lawkitM % "compile; test -> test")
   .settings(disciplineDependencies:_*)
-  .settings(addLibs(vAll, "scalatest"):_*)
+  .settings(addLibs(deps, "scalatest"):_*)
 
 /**
  * Specs2 - JVM project that defines test utilities for specs2
@@ -98,7 +120,7 @@ lazy val specs2 = project
   .settings(rootSettings:_*)
   .settings(commonJvmSettings:_*)
   .settings(disciplineDependencies:_*)
-  .settings(addLibs(vAll, "specs2-core","specs2-scalacheck" ):_*)
+  .settings(addLibs(deps, "specs2-core","specs2-scalacheck" ):_*)
 
 /**
  * Lawkit - cross project that add Law and Property checking ti TestKit
@@ -108,7 +130,7 @@ lazy val lawkitJVM = lawkitM.jvm
 lazy val lawkitJS  = lawkitM.js
 lazy val lawkitM   = module("lawkit", CrossType.Pure)
   .dependsOn(macrosM, testkitM)
-  .settings(typelevel.macroCompatSettings(vAll):_*)
+  .settings(typelevel.macroCompatSettings(deps):_*)
   .settings(disciplineDependencies:_*)
 
 /**
@@ -129,7 +151,7 @@ lazy val testkitJVM = testkitM.jvm
 lazy val testkitJS  = testkitM.js
 lazy val testkitM   = module("testkit", CrossType.Pure)
   .dependsOn(macrosM, platformM)
-  .settings(typelevel.macroCompatSettings(vAll):_*)
+  .settings(typelevel.macroCompatSettings(deps):_*)
 
 /**
  * Speclite - cross project that implements a basic test framework, with minimal external dependencies.
@@ -155,7 +177,7 @@ lazy val testsM   = module("tests", CrossType.Pure)
   .dependsOn(macrosM, platformM, testkitM, specliteM % "test-internal -> test", scalatestM % "test-internal -> test")
   .settings(disciplineDependencies:_*)
   .settings(noPublishSettings:_*)
-  .settings(addTestLibs(vAll, "scalatest" ):_*)
+  .settings(addTestLibs(deps, "scalatest" ):_*)
   .settings(testFrameworks ++= Seq(new TestFramework("catalysts.speclite.SpecLiteFramework")))
 
 /**
@@ -167,7 +189,7 @@ lazy val docs = project.configure(mkDocConfig(gh, rootSettings, commonJvmSetting
 /**
  * Settings
  */
-lazy val buildSettings = sharedBuildSettings(gh, vAll)
+lazy val buildSettings = sharedBuildSettings(gh, deps)
 
 lazy val commonSettings = sharedCommonSettings ++ Seq(
   scalacOptions ++= scalacAllOptions,
@@ -180,7 +202,11 @@ lazy val commonJsSettings = Seq(
 
 lazy val commonJvmSettings = Seq()
 
-lazy val disciplineDependencies = Seq(addLibs(vAll, "discipline", "scalacheck" ):_*)
+lazy val disciplineDependencies = Seq(addLibs(deps, "discipline", "scalacheck" ):_*)
+
+import com.typesafe.tools.mima.core.ProblemFilters
+import com.typesafe.tools.mima.core._
+lazy val mimaSettings = sharedMimaSettings(mimaPreviousVersion)
 
 lazy val publishSettings = sharedPublishSettings(gh, devs) ++ credentialSettings ++ sharedReleaseProcess
 

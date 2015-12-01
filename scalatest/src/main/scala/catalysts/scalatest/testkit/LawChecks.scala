@@ -15,6 +15,7 @@ trait Discipline extends Checkers {
     for ((id, prop) ← ruleSet.all.properties)
       it(name + "." + id) {
         check(prop)
+        ()
       }
   }
 }

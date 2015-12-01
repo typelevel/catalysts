@@ -3,4 +3,4 @@ resolvers += Resolver.url(
     url("http://dl.bintray.com/content/tpolecat/sbt-plugin-releases"))(
         Resolver.ivyStylePatterns)
 
-addSbtPlugin("com.github.inthenow" % "sbt-catalysts" % "0.1.6")
+addSbtPlugin("com.github.inthenow" % "sbt-catalysts" % "0.1.7-SNAPSHOT")
