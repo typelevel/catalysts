@@ -6,7 +6,7 @@ https://gitter.im/InTheNow/catalysts](https://badges.gitter.im/Join%20Chat.svg)]
 [![Stories in Ready](https://badge.waffle.io/InTheNow/catalysts.png?label=ready&title=Ready)](https://waffle.io/InTheNow/catalysts)
 [![codecov.io](http://codecov.io/github/InTheNow/catalysts/coverage.svg?branch=master)](http://codecov.io/github/InTheNow/catalysts?branch=master)
 
-Catalysts is an intentionally small library of small building blocks to help build platform independent Scala projects with SBT.
+Catalysts is an intentionally small library of small moduless to help build and test platform independent Scala projects with SBT.
 
 ### Maintainers
 
