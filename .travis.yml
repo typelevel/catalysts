@@ -5,17 +5,21 @@ sudo: false
 install:
   - pip install --user codecov
 
+language: scala
+  
 scala:
   - 2.10.6
   - 2.11.8
-  - 2.12.0-RC1
 
 jdk:
-  - oraclejdk8
-    
+  - oraclejdk7
+
+matrix:
+  include:
+  - scala: 2.12.0-RC1
+    jdk: oraclejdk8
+
 script:
-  - scripts/publishLocalScoverage.sh
-  - scripts/publishLocalSbtScoverage.sh
   - scripts/travis-publish.sh
 
 cache:
