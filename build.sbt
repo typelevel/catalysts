@@ -209,7 +209,7 @@ lazy val scoverageSettings = sharedScoverageSettings(60) ++ Seq(
 def localSharedBuildSettings(gh: GitHubSettings, v: Versions) = Seq(
     organization := gh.publishOrg,
     scalaVersion := v.vers("scalac"),
-    crossScalaVersions := Seq(v.vers("scalac_2.10"), "2.12.0-RC2", scalaVersion.value)
+    crossScalaVersions := Seq(v.vers("scalac_2.10"), "2.12.0", scalaVersion.value)
   )
 
 val cmdlineProfile = sys.props.getOrElse("sbt.profile", default = "")
