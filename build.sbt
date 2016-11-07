@@ -196,7 +196,8 @@ lazy val disciplineDependencies = Seq(addLibs(vAll, "discipline", "scalacheck" )
 lazy val publishSettings = sharedPublishSettings(gh, devs) ++ credentialSettings ++ sharedReleaseProcess
 
 lazy val scoverageSettings = sharedScoverageSettings(60) ++ Seq(
-  coverageExcludedPackages := "catalysts\\.Platform"
+  coverageExcludedPackages := "catalysts\\.Platform",
+  coverageScalacPluginVersion := "1.3.0"
 )
 
  /** Common coverage settings, with minimum coverage defaulting to 80.*/
