@@ -195,7 +195,7 @@ lazy val commonSettings = sharedCommonSettings ++ Seq(
   scalacOptions ++= scalacAllOptions,
   incOptions := incOptions.value.withLogRecompileOnMacro(false),
   parallelExecution in Test := false,
-  developers := Seq(Developer("Alistair Johnson", "BennyHill", "", new java.net.URL("https://bh.example")))
+  developers := List(Developer("Alistair Johnson", "BennyHill", "", new java.net.URL("https://bh.example")))
 ) ++ warnUnusedImport ++ unidocCommonSettings ++ update2_12
 
 lazy val commonJsSettings = Seq(
