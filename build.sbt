@@ -21,7 +21,6 @@ addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVe
  * Project settings
  */
 val gh = GitHubSettings(org = "typelevel", proj = "catalysts", publishOrg = "org.typelevel", license = apache)
-val devs = Seq(Developer("Alistair Johnson", "BennyHill", "", new java.net.URL("https://bh.example")))
 
 val vers = typelevel.versions ++ catalysts.versions
 val libs = typelevel.libraries ++ catalysts.libraries
@@ -195,7 +194,8 @@ lazy val buildSettings = localSharedBuildSettings(gh, vAll)
 lazy val commonSettings = sharedCommonSettings ++ Seq(
   scalacOptions ++= scalacAllOptions,
   incOptions := incOptions.value.withLogRecompileOnMacro(false),
-  parallelExecution in Test := false
+  parallelExecution in Test := false,
+  developers := Seq(Developer("Alistair Johnson", "BennyHill", "", new java.net.URL("https://bh.example")))
 ) ++ warnUnusedImport ++ unidocCommonSettings ++ update2_12
 
 lazy val commonJsSettings = Seq(
