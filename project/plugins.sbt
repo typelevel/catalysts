@@ -1,6 +1,6 @@
 //resolvers += Resolver.sonatypeRepo("releases")
 
-addSbtPlugin("org.typelevel" % "sbt-catalysts" % "0.8.4")
+addSbtPlugin("org.typelevel" % "sbt-catalysts" % "0.8.5")
 
 // override for now until sbt-catalysts is updated
 //addSbtPlugin("org.scala-js"        %  "sbt-scalajs"            % "0.6.19")
